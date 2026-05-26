@@ -19,44 +19,45 @@ var _ trace.SpanExporter = noopSpanExporter{}
 
 // ExportSpans is part of trace.SpanExporter interface.
 func (noopSpanExporter) ExportSpans(context.Context, []trace.ReadOnlySpan) error {
+	_ = "STUB: not implemented"
+
+	// Shutdown is part of trace.SpanExporter interface.
 	return nil
 }
 
-// Shutdown is part of trace.SpanExporter interface.
 func (noopSpanExporter) Shutdown(context.Context) error {
+	_ = "STUB: not implemented"
+
+	// IsNoneSpanExporter returns true for the exporter returned by [NewSpanExporter]
+	// when OTEL_TRACES_EXPORTER environment variable is set to "none".
 	return nil
 }
 
-// IsNoneSpanExporter returns true for the exporter returned by [NewSpanExporter]
-// when OTEL_TRACES_EXPORTER environment variable is set to "none".
-func IsNoneSpanExporter(e trace.SpanExporter) bool {
-	_, ok := e.(noopSpanExporter)
-	return ok
-}
+func IsNoneSpanExporter(e trace.SpanExporter) bool { _ = "STUB: not implemented"; return false }
 
 type noopMetricReader struct {
 	*metric.ManualReader
 }
 
 func newNoopMetricReader() noopMetricReader {
-	return noopMetricReader{metric.NewManualReader()}
+	_ = "STUB: not implemented"
+	return *new(noopMetricReader)
 }
 
 // IsNoneMetricReader returns true for the exporter returned by [NewMetricReader]
 // when OTEL_METRICS_EXPORTER environment variable is set to "none".
-func IsNoneMetricReader(e metric.Reader) bool {
-	_, ok := e.(noopMetricReader)
-	return ok
-}
+func IsNoneMetricReader(e metric.Reader) bool { _ = "STUB: not implemented"; return false }
 
 type noopMetricProducer struct{}
 
 func (noopMetricProducer) Produce(context.Context) ([]metricdata.ScopeMetrics, error) {
+	_ = "STUB: not implemented"
 	return nil, nil
 }
 
 func newNoopMetricProducer() noopMetricProducer {
-	return noopMetricProducer{}
+	_ = "STUB: not implemented"
+	return *new(noopMetricProducer)
 }
 
 // noopLogExporter is an implementation of log.SpanExporter that performs no operations.
@@ -66,22 +67,25 @@ var _ log.Exporter = noopLogExporter{}
 
 // ExportSpans is part of log.Exporter interface.
 func (noopLogExporter) Export(context.Context, []log.Record) error {
+	_ = "STUB: not implemented"
+
+	// Shutdown is part of log.Exporter interface.
 	return nil
 }
 
-// Shutdown is part of log.Exporter interface.
 func (noopLogExporter) Shutdown(context.Context) error {
+	_ = "STUB: not implemented"
+
+	// ForceFlush is part of log.Exporter interface.
 	return nil
 }
 
-// ForceFlush is part of log.Exporter interface.
 func (noopLogExporter) ForceFlush(context.Context) error {
+	_ = "STUB: not implemented"
+
+	// IsNoneLogExporter returns true for the exporter returned by [NewLogExporter]
+	// when OTEL_LOGSS_EXPORTER environment variable is set to "none".
 	return nil
 }
 
-// IsNoneLogExporter returns true for the exporter returned by [NewLogExporter]
-// when OTEL_LOGSS_EXPORTER environment variable is set to "none".
-func IsNoneLogExporter(e log.Exporter) bool {
-	_, ok := e.(noopLogExporter)
-	return ok
-}
+func IsNoneLogExporter(e log.Exporter) bool { _ = "STUB: not implemented"; return false }

@@ -7,16 +7,10 @@ package ec2 // import "go.opentelemetry.io/contrib/detectors/aws/ec2/v2"
 import (
 	"context"
 	"errors"
-	"fmt"
-	"io"
-	"net/http"
 
-	awshttp "github.com/aws/aws-sdk-go-v2/aws/transport/http"
-	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/feature/ec2/imds"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/resource"
-	semconv "go.opentelemetry.io/otel/semconv/v1.41.0"
 )
 
 var errClient = errors.New("EC2 Client Error")
@@ -40,58 +34,26 @@ var _ resource.Detector = (*resourceDetector)(nil)
 
 // NewResourceDetector returns a resource detector that will detect AWS EC2 resources.
 func NewResourceDetector() resource.Detector {
-	return &resourceDetector{c: newClient()}
+	_ = "STUB: not implemented"
+	return *new(resource.Detector)
 }
 
 func (detector *resourceDetector) getClient() client {
-	return detector.c
+	_ = "STUB: not implemented"
+
+	// Detect detects associated resources when running in AWS environment.
+	return *new(client)
 }
 
-// Detect detects associated resources when running in AWS environment.
 func (detector *resourceDetector) Detect(ctx context.Context) (*resource.Resource, error) {
+	_ = "STUB: not implemented"
 	// Return nil if not able to establish valid client
-	client := detector.getClient()
-	if client == nil {
-		return nil, errClient
-	}
-
-	// Available method removed in aws-sdk-go-v2, return empty resource if client returns error
-	doc, err := client.GetInstanceIdentityDocument(ctx, nil)
-	if err != nil {
-		return resource.Empty(), nil
-	}
-
-	attributes := []attribute.KeyValue{
-		semconv.CloudProviderAWS,
-		semconv.CloudPlatformAWSEC2,
-		semconv.CloudRegion(doc.Region),
-		semconv.CloudAvailabilityZone(doc.AvailabilityZone),
-		semconv.CloudAccountID(doc.AccountID),
-		semconv.HostID(doc.InstanceID),
-		semconv.HostImageID(doc.ImageID),
-		semconv.HostType(doc.InstanceType),
-	}
-
-	m := &metadata{client: client}
-	m.add(ctx, semconv.HostNameKey, "hostname")
-
-	attributes = append(attributes, m.attributes...)
-
-	if len(m.errs) > 0 {
-		err = fmt.Errorf("%w: %s", resource.ErrPartialResource, m.errs)
-	}
-
-	return resource.NewWithAttributes(semconv.SchemaURL, attributes...), err
+	return nil, nil
 }
 
-func newClient() client {
-	cfg, err := awsconfig.LoadDefaultConfig(context.Background())
-	if err != nil {
-		return nil
-	}
+// Available method removed in aws-sdk-go-v2, return empty resource if client returns error
 
-	return imds.NewFromConfig(cfg)
-}
+func newClient() client { _ = "STUB: not implemented"; return *new(client) }
 
 type metadata struct {
 	client     client
@@ -100,31 +62,8 @@ type metadata struct {
 }
 
 func (m *metadata) add(ctx context.Context, k attribute.Key, n string) {
-	metadataInput := &imds.GetMetadataInput{Path: n}
-	md, err := m.client.GetMetadata(ctx, metadataInput)
-	if err != nil {
-		m.recordError(n, err)
-		return
-	}
-	data, err := io.ReadAll(md.Content)
-	if err != nil {
-		m.recordError(n, err)
-		return
-	}
-	m.attributes = append(m.attributes, k.String(string(data)))
+	_ = "STUB: not implemented"
+	return
 }
 
-func (m *metadata) recordError(path string, err error) {
-	var rf *awshttp.ResponseError
-	ok := errors.As(err, &rf)
-	if !ok {
-		m.errs = append(m.errs, fmt.Errorf("%q: %w", path, err))
-		return
-	}
-
-	if rf.HTTPStatusCode() == http.StatusNotFound {
-		return
-	}
-
-	m.errs = append(m.errs, fmt.Errorf("%q: %d %s", path, rf.HTTPStatusCode(), rf.Error()))
-}
+func (m *metadata) recordError(path string, err error) { _ = "STUB: not implemented"; return }

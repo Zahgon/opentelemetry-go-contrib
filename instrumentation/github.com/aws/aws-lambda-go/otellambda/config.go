@@ -23,9 +23,13 @@ type Flusher interface {
 
 type noopFlusher struct{}
 
-func (*noopFlusher) ForceFlush(context.Context) error { return nil }
+func (*noopFlusher) ForceFlush(context.Context) error {
+	_ = "STUB: not implemented"
 
-// Compile time check our noopFlusher implements Flusher.
+	// Compile time check our noopFlusher implements Flusher.
+	return nil
+}
+
 var _ Flusher = &noopFlusher{}
 
 // An EventToCarrier function defines how the instrumentation should
@@ -41,12 +45,11 @@ type EventToCarrier func(eventJSON []byte) propagation.TextMapCarrier
 type TraceAttributeFn func(eventJSON []byte) []attribute.KeyValue
 
 func emptyEventToCarrier([]byte) propagation.TextMapCarrier {
-	return propagation.HeaderCarrier{}
+	_ = "STUB: not implemented"
+	return *new(propagation.TextMapCarrier)
 }
 
-func emptyTraceAttributeFn([]byte) []attribute.KeyValue {
-	return []attribute.KeyValue{}
-}
+func emptyTraceAttributeFn([]byte) []attribute.KeyValue { _ = "STUB: not implemented"; return nil }
 
 // Compile time check our emptyEventToCarrier implements EventToCarrier.
 var _ EventToCarrier = emptyEventToCarrier
@@ -58,9 +61,7 @@ type Option interface {
 
 type optionFunc func(*config)
 
-func (o optionFunc) apply(c *config) {
-	o(c)
-}
+func (o optionFunc) apply(c *config) { _ = "STUB: not implemented"; return }
 
 type config struct {
 	// TracerProvider is the TracerProvider which will be used
@@ -102,37 +103,29 @@ type config struct {
 //
 // By default, the global TracerProvider is used.
 func WithTracerProvider(tracerProvider trace.TracerProvider) Option {
-	return optionFunc(func(c *config) {
-		c.TracerProvider = tracerProvider
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithFlusher sets the used flusher.
-func WithFlusher(flusher Flusher) Option {
-	return optionFunc(func(c *config) {
-		c.Flusher = flusher
-	})
-}
+func WithFlusher(flusher Flusher) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithEventToCarrier sets the used EventToCarrier.
 func WithEventToCarrier(eventToCarrier EventToCarrier) Option {
-	return optionFunc(func(c *config) {
-		c.EventToCarrier = eventToCarrier
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithPropagator configures the propagator used by the instrumentation.
 //
 // By default, the global TextMapPropagator will be used.
 func WithPropagator(propagator propagation.TextMapPropagator) Option {
-	return optionFunc(func(c *config) {
-		c.Propagator = propagator
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithTraceAttributeFn configures a function that returns custom attributes.
 func WithTraceAttributeFn(fn TraceAttributeFn) Option {
-	return optionFunc(func(c *config) {
-		c.TraceAttributeFn = fn
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }

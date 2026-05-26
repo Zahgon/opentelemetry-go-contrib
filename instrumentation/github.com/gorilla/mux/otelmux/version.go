@@ -5,6 +5,8 @@ package otelmux // import "go.opentelemetry.io/contrib/instrumentation/github.co
 
 // Version is the current release version of the gorilla/mux instrumentation.
 func Version() string {
-	return "0.68.0"
+	_ = "STUB: not implemented"
+
 	// This string is updated by the pre_release.sh script during release
+	return ""
 }

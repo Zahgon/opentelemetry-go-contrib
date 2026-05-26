@@ -5,10 +5,7 @@ package autoprop // import "go.opentelemetry.io/contrib/propagators/autoprop"
 
 import (
 	"errors"
-	"os"
-	"strings"
 
-	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
 )
 
@@ -36,30 +33,17 @@ const otelPropagatorsEnvKey = "OTEL_PROPAGATORS"
 // TextMapPropagator will be a composite of the TraceContext and Baggage
 // propagators.
 func NewTextMapPropagator(props ...propagation.TextMapPropagator) propagation.TextMapPropagator {
+	_ = "STUB: not implemented"
 	// Environment variable defined propagator has precedence over arguments.
-	envProp, err := parseEnv()
-	if err != nil {
-		// Communicate to the user their supplied value will not be used.
-		otel.Handle(err)
-	}
-	if envProp != nil {
-		return envProp
-	}
-
-	switch len(props) {
-	case 0:
-		// Default to TraceContext and Baggage.
-		return propagation.NewCompositeTextMapPropagator(
-			propagation.TraceContext{}, propagation.Baggage{},
-		)
-	case 1:
-		// Do not add overhead with a composite propagator wrapping a single
-		// propagator, return it directly.
-		return props[0]
-	default:
-		return propagation.NewCompositeTextMapPropagator(props...)
-	}
+	return *new(propagation.TextMapPropagator)
 }
+
+// Communicate to the user their supplied value will not be used.
+
+// Default to TraceContext and Baggage.
+
+// Do not add overhead with a composite propagator wrapping a single
+// propagator, return it directly.
 
 // errUnknownPropagator is returned when an unknown propagator name is used in
 // the OTEL_PROPAGATORS environment variable.
@@ -71,9 +55,6 @@ var errUnknownPropagator = errors.New("unknown propagator")
 // TextMapPropagator will be returned if "none" is defined anywhere in the
 // environment variable.
 func parseEnv() (propagation.TextMapPropagator, error) {
-	propStrs := os.Getenv(otelPropagatorsEnvKey)
-	if propStrs == "" {
-		return nil, nil
-	}
-	return TextMapPropagator(strings.Split(propStrs, ",")...)
+	_ = "STUB: not implemented"
+	return *new(propagation.TextMapPropagator), nil
 }

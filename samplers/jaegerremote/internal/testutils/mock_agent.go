@@ -21,8 +21,6 @@
 package testutils // import "go.opentelemetry.io/contrib/samplers/jaegerremote/internal/testutils"
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 )
@@ -36,32 +34,18 @@ type MockAgent struct {
 
 // StartMockAgent runs a mock representation of jaeger-agent.
 // This function returns a started server.
-func StartMockAgent() (*MockAgent, error) {
-	samplingManager := newSamplingManager()
-	samplingHandler := &samplingHandler{manager: samplingManager}
-	samplingServer := httptest.NewServer(samplingHandler)
-
-	agent := &MockAgent{
-		samplingMgr: samplingManager,
-		samplingSrv: samplingServer,
-	}
-
-	return agent, nil
-}
+func StartMockAgent() (*MockAgent, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // Close stops the serving of traffic.
-func (s *MockAgent) Close() {
-	s.samplingSrv.Close()
-}
+func (s *MockAgent) Close() { _ = "STUB: not implemented"; return }
 
 // SamplingServerAddr returns the host:port of HTTP server exposing sampling strategy endpoint.
-func (s *MockAgent) SamplingServerAddr() string {
-	return s.samplingSrv.Listener.Addr().String()
-}
+func (s *MockAgent) SamplingServerAddr() string { _ = "STUB: not implemented"; return "" }
 
 // AddSamplingStrategy registers a sampling strategy for a service.
 func (s *MockAgent) AddSamplingStrategy(service string, strategy any) {
-	s.samplingMgr.AddSamplingStrategy(service, strategy)
+	_ = "STUB: not implemented"
+	return
 }
 
 type samplingHandler struct {
@@ -69,27 +53,6 @@ type samplingHandler struct {
 }
 
 func (h *samplingHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	services := r.URL.Query()["service"]
-	if len(services) == 0 {
-		http.Error(w, "'service' parameter is empty", http.StatusBadRequest)
-		return
-	}
-	if len(services) > 1 {
-		http.Error(w, "'service' parameter must occur only once", http.StatusBadRequest)
-		return
-	}
-	resp, err := h.manager.GetSamplingStrategy(services[0])
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Error retrieving strategy: %+v", err), http.StatusInternalServerError)
-		return
-	}
-	data, err := json.Marshal(resp)
-	if err != nil {
-		http.Error(w, "Cannot marshall Thrift to JSON", http.StatusInternalServerError)
-		return
-	}
-	w.Header().Add("Content-Type", "application/json")
-	if _, err := w.Write(data); err != nil {
-		return
-	}
+	_ = "STUB: not implemented"
+	return
 }

@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"strings"
 )
 
 const (
@@ -30,187 +29,48 @@ type otelTraceState struct {
 	unknown []string
 }
 
-func newTraceState() otelTraceState {
-	return otelTraceState{
-		rvalue: invalidValue, // out-of-range => !hasRValue()
-		pvalue: invalidValue, // out-of-range => !hasPValue()
-	}
+func newTraceState() otelTraceState { _ = "STUB: not implemented"; return *new(otelTraceState) }
+
+// out-of-range => !hasRValue()
+// out-of-range => !hasPValue()
+
+func (otts otelTraceState) serialize() string { _ = "STUB: not implemented"; return "" }
+
+// Note: should this generate an explicit error?
+
+func isValueByte(r byte) bool { _ = "STUB: not implemented"; return false }
+
+func isLCAlphaNum(r byte) bool { _ = "STUB: not implemented"; return false }
+
+func isLCAlpha(r byte) bool { _ = "STUB: not implemented"; return false }
+
+func isUCAlpha(r byte) bool { _ = "STUB: not implemented"; return false }
+
+func parseOTelTraceState(ts string, isSampled bool) (otelTraceState, error) {
+	_ = "STUB: not implemented" //nolint:revive // ignore linter
+	return *new(otelTraceState), nil
 }
 
-func (otts otelTraceState) serialize() string {
-	var sb strings.Builder
-	semi := func() {
-		if sb.Len() != 0 {
-			_, _ = sb.WriteString(";")
-		}
-	}
+// Note: does the spec say how to handle duplicates?
 
-	if otts.hasPValue() {
-		_, _ = fmt.Fprintf(&sb, "p:%d", otts.pvalue)
-	}
-	if otts.hasRValue() {
-		semi()
-		_, _ = fmt.Fprintf(&sb, "r:%d", otts.rvalue)
-	}
-	for _, unk := range otts.unknown {
-		ex := 0
-		if sb.Len() != 0 {
-			ex = 1
-		}
-		if sb.Len()+ex+len(unk) > traceStateSizeLimit {
-			// Note: should this generate an explicit error?
-			break
-		}
-		semi()
-		_, _ = sb.WriteString(unk)
-	}
-	return sb.String()
-}
+// test for a trailing ;
 
-func isValueByte(r byte) bool {
-	if isLCAlphaNum(r) {
-		return true
-	}
-	if isUCAlpha(r) {
-		return true
-	}
-	return r == '.' || r == '_' || r == '-'
-}
+// Note: set R before P, so that P won't propagate if R has an error.
 
-func isLCAlphaNum(r byte) bool {
-	if isLCAlpha(r) {
-		return true
-	}
-	return r >= '0' && r <= '9'
-}
+// Invariant checking: unset P when the values are inconsistent.
 
-func isLCAlpha(r byte) bool {
-	return r >= 'a' && r <= 'z'
-}
-
-func isUCAlpha(r byte) bool {
-	return r >= 'A' && r <= 'Z'
-}
-
-func parseOTelTraceState(ts string, isSampled bool) (otelTraceState, error) { //nolint:revive // ignore linter
-	var pval, rval string
-	var unknown []string
-
-	if ts == "" {
-		return newTraceState(), nil
-	}
-
-	if len(ts) > traceStateSizeLimit {
-		return newTraceState(), errTraceStateSyntax
-	}
-
-	for ts != "" {
-		eqPos := 0
-		for ; eqPos < len(ts); eqPos++ {
-			if eqPos == 0 {
-				if isLCAlpha(ts[eqPos]) {
-					continue
-				}
-			} else if isLCAlphaNum(ts[eqPos]) {
-				continue
-			}
-			break
-		}
-		if eqPos == 0 || eqPos == len(ts) || ts[eqPos] != ':' {
-			return newTraceState(), errTraceStateSyntax
-		}
-
-		key := ts[0:eqPos]
-		tail := ts[eqPos+1:]
-
-		sepPos := 0
-
-		for ; sepPos < len(tail); sepPos++ {
-			if isValueByte(tail[sepPos]) {
-				continue
-			}
-			break
-		}
-
-		switch key {
-		case pValueSubkey:
-			// Note: does the spec say how to handle duplicates?
-			pval = tail[0:sepPos]
-		case rValueSubkey:
-			rval = tail[0:sepPos]
-		default:
-			unknown = append(unknown, ts[0:sepPos+eqPos+1])
-		}
-
-		if sepPos < len(tail) && tail[sepPos] != ';' {
-			return newTraceState(), errTraceStateSyntax
-		}
-
-		if sepPos == len(tail) {
-			break
-		}
-
-		ts = tail[sepPos+1:]
-
-		// test for a trailing ;
-		if ts == "" {
-			return newTraceState(), errTraceStateSyntax
-		}
-	}
-
-	otts := newTraceState()
-	otts.unknown = unknown
-
-	// Note: set R before P, so that P won't propagate if R has an error.
-	value, err := parseNumber(rValueSubkey, rval, pZeroValue-1)
-	if err != nil {
-		return otts, err
-	}
-	otts.rvalue = value
-
-	value, err = parseNumber(pValueSubkey, pval, pZeroValue)
-	if err != nil {
-		return otts, err
-	}
-	otts.pvalue = value
-
-	// Invariant checking: unset P when the values are inconsistent.
-	if otts.hasPValue() && otts.hasRValue() {
-		implied := otts.pvalue <= otts.rvalue || otts.pvalue == pZeroValue
-
-		if !isSampled || !implied {
-			// Note: the error ensures the parent-based
-			// sampler repairs the broken tracestate entry.
-			otts.pvalue = invalidValue
-			return otts, parseError(pValueSubkey, errTraceStateInconsistent)
-		}
-	}
-
-	return otts, nil
-}
+// Note: the error ensures the parent-based
+// sampler repairs the broken tracestate entry.
 
 func parseNumber(key, input string, maximum uint8) (uint8, error) {
-	if input == "" {
-		return maximum + 1, nil
-	}
-	value, err := strconv.ParseUint(input, 10, 64)
-	if err != nil {
-		return maximum + 1, parseError(key, err)
-	}
-	if value > uint64(maximum) {
-		return maximum + 1, parseError(key, strconv.ErrRange)
-	}
-	return uint8(value), nil //nolint:gosec // `value` is strictly less then the uint8 maximum. This cast is safe.
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
-func parseError(key string, err error) error {
-	return fmt.Errorf("otel tracestate: %s-value %w", key, err)
-}
+//nolint:gosec // `value` is strictly less then the uint8 maximum. This cast is safe.
 
-func (otts otelTraceState) hasRValue() bool {
-	return otts.rvalue < pZeroValue
-}
+func parseError(key string, err error) error { _ = "STUB: not implemented"; return nil }
 
-func (otts otelTraceState) hasPValue() bool {
-	return otts.pvalue <= pZeroValue
-}
+func (otts otelTraceState) hasRValue() bool { _ = "STUB: not implemented"; return false }
+
+func (otts otelTraceState) hasPValue() bool { _ = "STUB: not implemented"; return false }

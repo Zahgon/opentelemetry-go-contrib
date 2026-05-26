@@ -34,96 +34,43 @@ type RespWriterWrapper struct {
 // The onWrite attribute is a callback that will be called every time the data
 // is written, with the number of bytes that were written.
 func NewRespWriterWrapper(w http.ResponseWriter, onWrite func(int64)) *RespWriterWrapper {
-	return &RespWriterWrapper{
-		ResponseWriter: w,
-		OnWrite:        onWrite,
-		statusCode:     http.StatusOK, // default status code in case the Handler doesn't write anything
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// default status code in case the Handler doesn't write anything
 
 // Write writes the bytes array into the [ResponseWriter], and tracks the
 // number of bytes written and last error.
-func (w *RespWriterWrapper) Write(p []byte) (int, error) {
-	w.mu.Lock()
-	defer w.mu.Unlock()
-
-	if !w.wroteHeader {
-		w.writeHeader(http.StatusOK)
-	}
-
-	n, err := w.ResponseWriter.Write(p)
-	n1 := int64(n)
-	w.OnWrite(n1)
-	w.written += n1
-	w.err = err
-	return n, err
-}
+func (w *RespWriterWrapper) Write(p []byte) (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
 // WriteHeader persists initial statusCode for span attribution.
 // All calls to WriteHeader will be propagated to the underlying ResponseWriter
 // and will persist the statusCode from the first call (except for informational response status codes).
 // Blocking consecutive calls to WriteHeader alters expected behavior and will
 // remove warning logs from net/http where developers will notice incorrect handler implementations.
-func (w *RespWriterWrapper) WriteHeader(statusCode int) {
-	w.mu.Lock()
-	defer w.mu.Unlock()
-
-	w.writeHeader(statusCode)
-}
+func (w *RespWriterWrapper) WriteHeader(statusCode int) { _ = "STUB: not implemented"; return }
 
 // writeHeader persists the status code for span attribution, and propagates
 // the call to the underlying ResponseWriter.
 // It does not acquire a lock, and therefore assumes that is being handled by a
 // parent method.
 func (w *RespWriterWrapper) writeHeader(statusCode int) {
-	if !w.wroteHeader {
-		// Ignore informational response status codes.
-		// Based on https://github.com/golang/go/blob/go1.24.1/src/net/http/server.go#L1216
-		if statusCode >= 100 && statusCode <= 199 && statusCode != http.StatusSwitchingProtocols {
-			w.ResponseWriter.WriteHeader(statusCode)
-			return
-		}
+	_ = "STUB: not implemented"
 
-		w.wroteHeader = true
-		w.statusCode = statusCode
-	}
-	w.ResponseWriter.WriteHeader(statusCode)
+	// Ignore informational response status codes.
+	// Based on https://github.com/golang/go/blob/go1.24.1/src/net/http/server.go#L1216
+	return
 }
 
 // Flush implements [http.Flusher].
-func (w *RespWriterWrapper) Flush() {
-	w.mu.Lock()
-	defer w.mu.Unlock()
-
-	if !w.wroteHeader {
-		w.writeHeader(http.StatusOK)
-	}
-
-	if f, ok := w.ResponseWriter.(http.Flusher); ok {
-		f.Flush()
-	}
-}
+func (w *RespWriterWrapper) Flush() { _ = "STUB: not implemented"; return }
 
 // BytesWritten returns the number of bytes written.
-func (w *RespWriterWrapper) BytesWritten() int64 {
-	w.mu.RLock()
-	defer w.mu.RUnlock()
-
-	return w.written
-}
+func (w *RespWriterWrapper) BytesWritten() int64 { _ = "STUB: not implemented"; return 0 }
 
 // StatusCode returns the HTTP status code that was sent.
-func (w *RespWriterWrapper) StatusCode() int {
-	w.mu.RLock()
-	defer w.mu.RUnlock()
-
-	return w.statusCode
-}
+func (w *RespWriterWrapper) StatusCode() int { _ = "STUB: not implemented"; return 0 }
 
 // Error returns the last error.
-func (w *RespWriterWrapper) Error() error {
-	w.mu.RLock()
-	defer w.mu.RUnlock()
-
-	return w.err
-}
+func (w *RespWriterWrapper) Error() error { _ = "STUB: not implemented"; return nil }

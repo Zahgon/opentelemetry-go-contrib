@@ -10,17 +10,13 @@ package semconv // import "go.opentelemetry.io/contrib/instrumentation/github.co
 
 import (
 	"context"
-	"fmt"
 	"net/http"
-	"slices"
-	"strings"
 	"sync"
 	"time"
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/semconv/v1.41.0"
 	"go.opentelemetry.io/otel/semconv/v1.41.0/httpconv"
 )
 
@@ -44,37 +40,16 @@ type HTTPServer struct {
 }
 
 func NewHTTPServer(meter metric.Meter) HTTPServer {
-	server := HTTPServer{}
-
-	var err error
-	server.requestBodySizeHistogram, err = httpconv.NewServerRequestBodySize(meter)
-	handleErr(err)
-
-	server.responseBodySizeHistogram, err = httpconv.NewServerResponseBodySize(meter)
-	handleErr(err)
-
-	server.requestDurationHistogram, err = httpconv.NewServerRequestDuration(
-		meter,
-		metric.WithExplicitBucketBoundaries(
-			0.005, 0.01, 0.025, 0.05, 0.075, 0.1,
-			0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10,
-		),
-	)
-	handleErr(err)
-	return server
+	_ = "STUB: not implemented"
+	return *new(HTTPServer)
 }
 
 // Status returns a span status code and message for an HTTP status code
 // value returned by a server. Status codes in the 400-499 range are not
 // returned as errors.
 func (n HTTPServer) Status(code int) (codes.Code, string) {
-	if code < 100 || code >= 600 {
-		return codes.Error, fmt.Sprintf("Invalid HTTP status code %d", code)
-	}
-	if code >= 500 {
-		return codes.Error, ""
-	}
-	return codes.Unset, ""
+	_ = "STUB: not implemented"
+	return *new(codes.Code), ""
 }
 
 // RequestTraceAttrs returns trace attributes for an HTTP request received by a
@@ -94,140 +69,27 @@ func (n HTTPServer) Status(code int) (codes.Code, string) {
 // If the primary server name is not known, server should be an empty string.
 // The req Host will be used to determine the server instead.
 func (n HTTPServer) RequestTraceAttrs(server string, req *http.Request, opts RequestTraceAttrsOpts) []attribute.KeyValue {
-	count := 3 // ServerAddress, Method, Scheme
-
-	var host string
-	var p int
-	if server == "" {
-		host, p = SplitHostPort(req.Host)
-	} else {
-		// Prioritize the primary server name.
-		host, p = SplitHostPort(server)
-		if p < 0 {
-			_, p = SplitHostPort(req.Host)
-		}
-	}
-
-	hostPort := requiredHTTPPort(req.TLS != nil, p)
-	if hostPort > 0 {
-		count++
-	}
-
-	method, methodOriginal := n.method(req.Method)
-	if methodOriginal != (attribute.KeyValue{}) {
-		count++
-	}
-
-	scheme := n.scheme(req.TLS != nil)
-
-	peer, peerPort := SplitHostPort(req.RemoteAddr)
-	if peer != "" {
-		// The Go HTTP server sets RemoteAddr to "IP:port", this will not be a
-		// file-path that would be interpreted with a sock family.
-		count++
-		if peerPort > 0 {
-			count++
-		}
-	}
-
-	useragent := req.UserAgent()
-	if useragent != "" {
-		count++
-	}
-
-	// For client IP, use, in order:
-	// 1. The value passed in the options
-	// 2. The value in the X-Forwarded-For header
-	// 3. The peer address
-	clientIP := opts.HTTPClientIP
-	if clientIP == "" {
-		clientIP = serverClientIP(req.Header.Get("X-Forwarded-For"))
-		if clientIP == "" {
-			clientIP = peer
-		}
-	}
-	if clientIP != "" {
-		count++
-	}
-
-	if req.URL != nil && req.URL.Path != "" {
-		count++
-	}
-
-	protoName, protoVersion := netProtocol(req.Proto)
-	if protoName != "" && protoName != "http" {
-		count++
-	}
-	if protoVersion != "" {
-		count++
-	}
-
-	route := httpRoute(req.Pattern)
-	if route != "" {
-		count++
-	}
-
-	attrs := make([]attribute.KeyValue, 0, count)
-	attrs = append(attrs,
-		semconv.ServerAddress(host),
-		method,
-		scheme,
-	)
-
-	if hostPort > 0 {
-		attrs = append(attrs, semconv.ServerPort(hostPort))
-	}
-	if methodOriginal != (attribute.KeyValue{}) {
-		attrs = append(attrs, methodOriginal)
-	}
-
-	if peer, peerPort := SplitHostPort(req.RemoteAddr); peer != "" {
-		// The Go HTTP server sets RemoteAddr to "IP:port", this will not be a
-		// file-path that would be interpreted with a sock family.
-		attrs = append(attrs, semconv.NetworkPeerAddress(peer))
-		if peerPort > 0 {
-			attrs = append(attrs, semconv.NetworkPeerPort(peerPort))
-		}
-	}
-
-	if useragent != "" {
-		attrs = append(attrs, semconv.UserAgentOriginal(useragent))
-	}
-
-	if clientIP != "" {
-		attrs = append(attrs, semconv.ClientAddress(clientIP))
-	}
-
-	if req.URL != nil && req.URL.Path != "" {
-		attrs = append(attrs, semconv.URLPath(req.URL.Path))
-	}
-
-	if protoName != "" && protoName != "http" {
-		attrs = append(attrs, semconv.NetworkProtocolName(protoName))
-	}
-	if protoVersion != "" {
-		attrs = append(attrs, semconv.NetworkProtocolVersion(protoVersion))
-	}
-
-	if route != "" {
-		attrs = append(attrs, n.Route(route))
-	}
-
-	return attrs
+	_ = "STUB: not implemented"
+	// ServerAddress, Method, Scheme
+	return nil
 }
 
-func (s HTTPServer) NetworkTransportAttr(network string) []attribute.KeyValue {
-	attr := semconv.NetworkTransportPipe
-	switch network {
-	case "tcp", "tcp4", "tcp6":
-		attr = semconv.NetworkTransportTCP
-	case "udp", "udp4", "udp6":
-		attr = semconv.NetworkTransportUDP
-	case "unix", "unixgram", "unixpacket":
-		attr = semconv.NetworkTransportUnix
-	}
+// Prioritize the primary server name.
 
-	return []attribute.KeyValue{attr}
+// The Go HTTP server sets RemoteAddr to "IP:port", this will not be a
+// file-path that would be interpreted with a sock family.
+
+// For client IP, use, in order:
+// 1. The value passed in the options
+// 2. The value in the X-Forwarded-For header
+// 3. The peer address
+
+// The Go HTTP server sets RemoteAddr to "IP:port", this will not be a
+// file-path that would be interpreted with a sock family.
+
+func (s HTTPServer) NetworkTransportAttr(network string) []attribute.KeyValue {
+	_ = "STUB: not implemented"
+	return nil
 }
 
 type ServerMetricData struct {
@@ -258,15 +120,8 @@ var metricRecordOptionPool = &sync.Pool{
 }
 
 func (n HTTPServer) RecordMetrics(ctx context.Context, md ServerMetricData) {
-	attributes := n.MetricAttributes(md.ServerName, md.Req, md.StatusCode, md.Route, md.AdditionalAttributes)
-	o := metric.WithAttributeSet(attribute.NewSet(attributes...))
-	recordOpts := metricRecordOptionPool.Get().(*[]metric.RecordOption)
-	*recordOpts = append(*recordOpts, o)
-	n.requestBodySizeHistogram.Inst().Record(ctx, md.RequestSize, *recordOpts...)
-	n.responseBodySizeHistogram.Inst().Record(ctx, md.ResponseSize, *recordOpts...)
-	n.requestDurationHistogram.Inst().Record(ctx, durationToSeconds(md.RequestDuration), o)
-	*recordOpts = (*recordOpts)[:0]
-	metricRecordOptionPool.Put(recordOpts)
+	_ = "STUB: not implemented"
+	return
 }
 
 // SpanName returns the span name for an HTTP request following the
@@ -274,39 +129,16 @@ func (n HTTPServer) RecordMetrics(ctx context.Context, md ServerMetricData) {
 // It returns "{method} {route}" when the request has a pattern,
 // or just "{method}" when no route is available.
 // Non-standard HTTP methods are replaced by "HTTP".
-func (n HTTPServer) SpanName(r *http.Request) string {
-	method := strings.ToUpper(r.Method)
-	if _, ok := methodLookup[method]; !ok {
-		method = "HTTP"
-	}
-
-	route := httpRoute(r.Pattern)
-	if route != "" {
-		return method + " " + route
-	}
-	return method
-}
+func (n HTTPServer) SpanName(r *http.Request) string { _ = "STUB: not implemented"; return "" }
 
 func (n HTTPServer) method(method string) (attribute.KeyValue, attribute.KeyValue) {
-	if method == "" {
-		return semconv.HTTPRequestMethodOther, attribute.KeyValue{}
-	}
-	if attr, ok := methodLookup[method]; ok {
-		return attr, attribute.KeyValue{}
-	}
-
-	orig := semconv.HTTPRequestMethodOriginal(method)
-	if attr, ok := methodLookup[strings.ToUpper(method)]; ok {
-		return attr, orig
-	}
-	return semconv.HTTPRequestMethodOther, orig
+	_ = "STUB: not implemented"
+	return *new(attribute.KeyValue), *new(attribute.KeyValue)
 }
 
-func (n HTTPServer) scheme(https bool) attribute.KeyValue { //nolint:revive // ignore linter
-	if https {
-		return semconv.URLScheme("https")
-	}
-	return semconv.URLScheme("http")
+func (n HTTPServer) scheme(https bool) attribute.KeyValue {
+	_ = "STUB: not implemented" //nolint:revive // ignore linter
+	return *new(attribute.KeyValue)
 }
 
 // ResponseTraceAttrs returns trace attributes for telemetry from an HTTP
@@ -315,101 +147,19 @@ func (n HTTPServer) scheme(https bool) attribute.KeyValue { //nolint:revive // i
 // If any of the fields in the ResponseTelemetry are not set the attribute will
 // be omitted.
 func (n HTTPServer) ResponseTraceAttrs(resp ResponseTelemetry) []attribute.KeyValue {
-	var count int
-
-	if resp.ReadBytes > 0 {
-		count++
-	}
-	if resp.WriteBytes > 0 {
-		count++
-	}
-	if resp.StatusCode > 0 {
-		count++
-	}
-
-	attributes := make([]attribute.KeyValue, 0, count)
-
-	if resp.ReadBytes > 0 {
-		attributes = append(attributes,
-			semconv.HTTPRequestBodySize(int(resp.ReadBytes)),
-		)
-	}
-	if resp.WriteBytes > 0 {
-		attributes = append(attributes,
-			semconv.HTTPResponseBodySize(int(resp.WriteBytes)),
-		)
-	}
-	if resp.StatusCode > 0 {
-		attributes = append(attributes,
-			semconv.HTTPResponseStatusCode(resp.StatusCode),
-		)
-	}
-
-	return attributes
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Route returns the attribute for the route.
 func (n HTTPServer) Route(route string) attribute.KeyValue {
-	return semconv.HTTPRoute(route)
+	_ = "STUB: not implemented"
+	return *new(attribute.KeyValue)
 }
 
 func (n HTTPServer) MetricAttributes(server string, req *http.Request, statusCode int, route string, additionalAttributes []attribute.KeyValue) []attribute.KeyValue {
-	num := len(additionalAttributes) + 3
-	var host string
-	var p int
-	if server == "" {
-		host, p = SplitHostPort(req.Host)
-	} else {
-		// Prioritize the primary server name.
-		host, p = SplitHostPort(server)
-		if p < 0 {
-			_, p = SplitHostPort(req.Host)
-		}
-	}
-	hostPort := requiredHTTPPort(req.TLS != nil, p)
-	if hostPort > 0 {
-		num++
-	}
-	protoName, protoVersion := netProtocol(req.Proto)
-	if protoName != "" {
-		num++
-	}
-	if protoVersion != "" {
-		num++
-	}
-
-	if statusCode > 0 {
-		num++
-	}
-	if route == "" && req.Pattern != "" {
-		route = httpRoute(req.Pattern)
-	}
-	if route != "" {
-		num++
-	}
-
-	attributes := slices.Grow(additionalAttributes, num)
-	attributes = append(attributes,
-		semconv.HTTPRequestMethodKey.String(standardizeHTTPMethod(req.Method)),
-		n.scheme(req.TLS != nil),
-		semconv.ServerAddress(host))
-
-	if hostPort > 0 {
-		attributes = append(attributes, semconv.ServerPort(hostPort))
-	}
-	if protoName != "" {
-		attributes = append(attributes, semconv.NetworkProtocolName(protoName))
-	}
-	if protoVersion != "" {
-		attributes = append(attributes, semconv.NetworkProtocolVersion(protoVersion))
-	}
-
-	if statusCode > 0 {
-		attributes = append(attributes, semconv.HTTPResponseStatusCode(statusCode))
-	}
-
-	if route != "" {
-		attributes = append(attributes, semconv.HTTPRoute(route))
-	}
-	return attributes
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Prioritize the primary server name.

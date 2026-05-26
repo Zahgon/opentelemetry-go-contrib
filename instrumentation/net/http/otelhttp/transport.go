@@ -9,16 +9,11 @@ import (
 	"net/http"
 	"net/http/httptrace"
 	"sync/atomic"
-	"time"
 
-	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/propagation"
-	otelsemconv "go.opentelemetry.io/otel/semconv/v1.41.0"
 	"go.opentelemetry.io/otel/trace"
 
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp/internal/request"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp/internal/semconv"
 )
 
@@ -47,165 +42,56 @@ var _ http.RoundTripper = &Transport{}
 // If the provided http.RoundTripper is nil, http.DefaultTransport will be used
 // as the base http.RoundTripper.
 func NewTransport(base http.RoundTripper, opts ...Option) *Transport {
-	if base == nil {
-		base = http.DefaultTransport
-	}
-
-	t := Transport{
-		rt: base,
-	}
-
-	defaultOpts := []Option{
-		WithSpanOptions(trace.WithSpanKind(trace.SpanKindClient)),
-		WithSpanNameFormatter(defaultTransportFormatter),
-	}
-
-	c := newConfig(append(defaultOpts, opts...)...)
-	t.applyConfig(c)
-
-	return &t
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (t *Transport) applyConfig(c *config) {
-	t.tracer = c.Tracer
-	t.propagators = c.Propagators
-	t.spanStartOptions = c.SpanStartOptions
-	t.filters = c.Filters
-	t.spanNameFormatter = c.SpanNameFormatter
-	t.clientTrace = c.ClientTrace
-	t.semconv = semconv.NewHTTPClient(c.Meter)
-	t.metricAttributesFn = c.MetricAttributesFn
-}
+func (t *Transport) applyConfig(c *config) { _ = "STUB: not implemented"; return }
 
 func defaultTransportFormatter(_ string, r *http.Request) string {
-	return "HTTP " + r.Method
+	_ = "STUB: not implemented"
+	return ""
+
+	// RoundTrip creates a Span and propagates its context via the provided request's headers
+	// before handing the request to the configured base RoundTripper. The created span will
+	// end when the response body is closed or when a read from the body returns io.EOF.
 }
 
-// RoundTrip creates a Span and propagates its context via the provided request's headers
-// before handing the request to the configured base RoundTripper. The created span will
-// end when the response body is closed or when a read from the body returns io.EOF.
 func (t *Transport) RoundTrip(r *http.Request) (*http.Response, error) {
-	requestStartTime := time.Now()
-	for _, f := range t.filters {
-		if !f(r) {
-			// Simply pass through to the base RoundTripper if a filter rejects the request
-			return t.rt.RoundTrip(r)
-		}
-	}
-
-	tracer := t.tracer
-
-	if tracer == nil {
-		if span := trace.SpanFromContext(r.Context()); span.SpanContext().IsValid() {
-			tracer = newTracer(span.TracerProvider())
-		} else {
-			tracer = newTracer(otel.GetTracerProvider())
-		}
-	}
-
-	ctx, span := tracer.Start(r.Context(), t.spanNameFormatter("", r), t.spanStartOptions...)
-
-	if t.clientTrace != nil {
-		ctx = httptrace.WithClientTrace(ctx, t.clientTrace(ctx))
-	}
-
-	labeler, found := LabelerFromContext(ctx)
-	if !found {
-		ctx = ContextWithLabeler(ctx, labeler)
-	}
-
-	r = r.Clone(ctx) // According to RoundTripper spec, we shouldn't modify the origin request.
-
-	var lastBW *request.BodyWrapper // Records the last body wrapper. Can be nil.
-	maybeWrapBody := func(body io.ReadCloser) io.ReadCloser {
-		if body == nil || body == http.NoBody {
-			return body
-		}
-		bw := request.NewBodyWrapper(body, func(int64) {})
-		lastBW = bw
-		return bw
-	}
-	r.Body = maybeWrapBody(r.Body)
-	if r.GetBody != nil {
-		originalGetBody := r.GetBody
-		r.GetBody = func() (io.ReadCloser, error) {
-			b, err := originalGetBody()
-			if err != nil {
-				lastBW = nil // The underlying transport will fail to make a retry request, hence, record no data.
-				return nil, err
-			}
-			return maybeWrapBody(b), nil
-		}
-	}
-
-	span.SetAttributes(t.semconv.RequestTraceAttrs(r)...)
-	t.propagators.Inject(ctx, propagation.HeaderCarrier(r.Header))
-
-	res, err := t.rt.RoundTrip(r)
-
-	// Record the metrics on error or no error.
-	statusCode := 0
-	if err == nil {
-		statusCode = res.StatusCode
-	}
-	var requestSize int64
-	if lastBW != nil {
-		requestSize = lastBW.BytesRead()
-	}
-	t.semconv.RecordMetrics(
-		ctx,
-		semconv.MetricData{
-			RequestSize:     requestSize,
-			RequestDuration: time.Since(requestStartTime),
-		},
-		t.semconv.MetricOptions(semconv.MetricAttributes{
-			Req:                  r,
-			StatusCode:           statusCode,
-			Err:                  err,
-			AdditionalAttributes: append(labeler.Get(), t.metricAttributesFromRequest(r)...),
-		}),
-	)
-
-	if err != nil {
-		span.SetAttributes(otelsemconv.ErrorType(err))
-		span.SetStatus(codes.Error, err.Error())
-		span.End()
-
-		return res, err
-	}
-
-	readRecordFunc := func(int64) {}
-	res.Body = newWrappedBody(span, readRecordFunc, res.Body)
-	// traces
-	span.SetAttributes(t.semconv.ResponseTraceAttrs(res)...)
-	span.SetStatus(t.semconv.Status(res.StatusCode))
-
-	return res, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Simply pass through to the base RoundTripper if a filter rejects the request
+
+// According to RoundTripper spec, we shouldn't modify the origin request.
+
+// Records the last body wrapper. Can be nil.
+
+// The underlying transport will fail to make a retry request, hence, record no data.
+
+// Record the metrics on error or no error.
+
+// traces
 
 func (t *Transport) metricAttributesFromRequest(r *http.Request) []attribute.KeyValue {
-	var attributeForRequest []attribute.KeyValue
-	if t.metricAttributesFn != nil {
-		attributeForRequest = t.metricAttributesFn(r)
-	}
-	return attributeForRequest
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // newWrappedBody returns a new and appropriately scoped *wrappedBody as an
 // io.ReadCloser. If the passed body implements io.Writer, the returned value
 // will implement io.ReadWriteCloser.
 func newWrappedBody(span trace.Span, record func(n int64), body io.ReadCloser) io.ReadCloser {
+	_ = "STUB: not implemented"
 	// The successful protocol switch responses will have a body that
 	// implement an io.ReadWriteCloser. Ensure this interface type continues
 	// to be satisfied if that is the case.
-	if _, ok := body.(io.ReadWriteCloser); ok {
-		return &wrappedBody{span: span, record: record, body: body}
-	}
-
-	// Remove the implementation of the io.ReadWriteCloser and only implement
-	// the io.ReadCloser.
-	return struct{ io.ReadCloser }{&wrappedBody{span: span, record: record, body: body}}
+	return *new(io.ReadCloser)
 }
+
+// Remove the implementation of the io.ReadWriteCloser and only implement
+// the io.ReadCloser.
 
 // wrappedBody is the response body type returned by the transport
 // instrumentation to complete a span. Errors encountered when using the
@@ -226,50 +112,31 @@ type wrappedBody struct {
 var _ io.ReadWriteCloser = &wrappedBody{}
 
 func (wb *wrappedBody) Write(p []byte) (int, error) {
+	_ = "STUB: not implemented"
 	// This will not panic given the guard in newWrappedBody.
-	n, err := wb.body.(io.Writer).Write(p)
-	if err != nil {
-		wb.span.SetAttributes(otelsemconv.ErrorType(err))
-		wb.span.SetStatus(codes.Error, err.Error())
-	}
-	return n, err
+	return 0, nil
 }
 
 func (wb *wrappedBody) Read(b []byte) (int, error) {
-	n, err := wb.body.Read(b)
-	// Record the number of bytes read
-	wb.read.Add(int64(n))
+	_ = "STUB: not implemented"
+	return 0,
 
-	switch err {
-	case nil:
-		// nothing to do here but fall through to the return
-	case io.EOF:
-		wb.recordBytesRead()
-		wb.span.End()
-	default:
-		wb.span.SetAttributes(otelsemconv.ErrorType(err))
-		wb.span.SetStatus(codes.Error, err.Error())
-	}
-	return n, err
+		// Record the number of bytes read
+		nil
 }
+
+// nothing to do here but fall through to the return
 
 // recordBytesRead is a function that ensures the number of bytes read is recorded once and only once.
 func (wb *wrappedBody) recordBytesRead() {
+	_ = "STUB: not implemented"
 	// note: it is more performant (and equally correct) to use atomic.Bool over sync.Once here. In the event that
 	// two goroutines are racing to call this method, the number of bytes read will no longer increase. Using
 	// CompareAndSwap allows later goroutines to return quickly and not block waiting for the race winner to finish
 	// calling wb.record(wb.read.Load()).
-	if wb.recorded.CompareAndSwap(false, true) {
-		// Record the total number of bytes read
-		wb.record(wb.read.Load())
-	}
+	return
 }
 
-func (wb *wrappedBody) Close() error {
-	wb.recordBytesRead()
-	wb.span.End()
-	if wb.body != nil {
-		return wb.body.Close()
-	}
-	return nil
-}
+// Record the total number of bytes read
+
+func (wb *wrappedBody) Close() error { _ = "STUB: not implemented"; return nil }

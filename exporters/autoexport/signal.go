@@ -5,7 +5,6 @@ package autoexport // import "go.opentelemetry.io/contrib/exporters/autoexport"
 
 import (
 	"context"
-	"os"
 )
 
 type signal[T any] struct {
@@ -13,30 +12,11 @@ type signal[T any] struct {
 	registry *registry[T]
 }
 
-func newSignal[T any](envKey string) signal[T] {
-	return signal[T]{
-		envKey: envKey,
-		registry: &registry[T]{
-			names: make(map[string]func(context.Context) (T, error)),
-		},
-	}
-}
+func newSignal[T any](envKey string) signal[T] { _ = "STUB: not implemented"; return nil }
 
 func (s signal[T]) create(ctx context.Context, opts ...option[T]) (T, error) {
-	var cfg config[T]
-	for _, opt := range opts {
-		opt.apply(&cfg)
-	}
-
-	expType := os.Getenv(s.envKey)
-	if expType == "" {
-		if cfg.fallbackFactory != nil {
-			return cfg.fallbackFactory(ctx)
-		}
-		expType = "otlp"
-	}
-
-	return s.registry.load(ctx, expType)
+	_ = "STUB: not implemented"
+	return *new(T), nil
 }
 
 type config[T any] struct {
@@ -50,12 +30,9 @@ type option[T any] interface {
 type optionFunc[T any] func(cfg *config[T])
 
 //lint:ignore U1000 https://github.com/dominikh/go-tools/issues/1440
-func (fn optionFunc[T]) apply(cfg *config[T]) {
-	fn(cfg)
-}
+func (fn optionFunc[T]) apply(cfg *config[T]) { _ = "STUB: not implemented"; return }
 
 func withFallbackFactory[T any](fallbackFactory func(ctx context.Context) (T, error)) option[T] {
-	return optionFunc[T](func(cfg *config[T]) {
-		cfg.fallbackFactory = fallbackFactory
-	})
+	_ = "STUB: not implemented"
+	return nil
 }

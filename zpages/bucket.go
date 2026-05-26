@@ -39,38 +39,13 @@ type bucket struct {
 }
 
 // newBucket returns a new bucket with the given capacity.
-func newBucket(capacity uint) *bucket {
-	return &bucket{
-		buffer: make([]sdktrace.ReadOnlySpan, capacity),
-	}
-}
+func newBucket(capacity uint) *bucket { _ = "STUB: not implemented"; return nil }
 
 // add adds a span to the bucket, if nextTime has been reached.
-func (b *bucket) add(s sdktrace.ReadOnlySpan) {
-	if s.EndTime().Before(b.nextTime) {
-		return
-	}
-	if len(b.buffer) == 0 {
-		return
-	}
-	b.nextTime = s.EndTime().Add(samplePeriod)
-	b.buffer[b.nextIndex] = s
-	b.nextIndex++
-	if b.nextIndex == len(b.buffer) {
-		b.nextIndex = 0
-		b.overflow = true
-	}
-}
+func (b *bucket) add(s sdktrace.ReadOnlySpan) { _ = "STUB: not implemented"; return }
 
 // len returns the number of spans in the bucket.
-func (b *bucket) len() int {
-	if b.overflow {
-		return len(b.buffer)
-	}
-	return b.nextIndex
-}
+func (b *bucket) len() int { _ = "STUB: not implemented"; return 0 }
 
 // spans returns the spans in this bucket.
-func (b *bucket) spans() []sdktrace.ReadOnlySpan {
-	return append([]sdktrace.ReadOnlySpan(nil), b.buffer[0:b.len()]...)
-}
+func (b *bucket) spans() []sdktrace.ReadOnlySpan { _ = "STUB: not implemented"; return nil }

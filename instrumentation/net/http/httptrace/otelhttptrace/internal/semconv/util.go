@@ -7,13 +7,9 @@
 package semconv // import "go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace/internal/semconv"
 
 import (
-	"net"
 	"net/http"
-	"strconv"
-	"strings"
 	"time"
 
-	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	semconvNew "go.opentelemetry.io/otel/semconv/v1.41.0"
 )
@@ -26,77 +22,26 @@ import (
 // An empty host is returned if it is not provided or unparsable. A negative
 // port is returned if it is not provided or unparsable.
 func SplitHostPort(hostport string) (host string, port int) {
-	port = -1
-
-	if strings.HasPrefix(hostport, "[") {
-		addrEnd := strings.LastIndexByte(hostport, ']')
-		if addrEnd < 0 {
-			// Invalid hostport.
-			return
-		}
-		if i := strings.LastIndexByte(hostport[addrEnd:], ':'); i < 0 {
-			host = hostport[1:addrEnd]
-			return
-		}
-	} else {
-		if i := strings.LastIndexByte(hostport, ':'); i < 0 {
-			host = hostport
-			return
-		}
-	}
-
-	host, pStr, err := net.SplitHostPort(hostport)
-	if err != nil {
-		return
-	}
-
-	p, err := strconv.ParseUint(pStr, 10, 16)
-	if err != nil {
-		return
-	}
-	return host, int(p) //nolint:gosec  // Byte size checked 16 above.
+	_ = "STUB: not implemented"
+	return "", 0
 }
 
-func requiredHTTPPort(https bool, port int) int { //nolint:revive // ignore linter
-	if https {
-		if port > 0 && port != 443 {
-			return port
-		}
-	} else {
-		if port > 0 && port != 80 {
-			return port
-		}
-	}
-	return -1
+// Invalid hostport.
+
+//nolint:gosec  // Byte size checked 16 above.
+
+func requiredHTTPPort(https bool, port int) int {
+	_ = "STUB: not implemented" //nolint:revive // ignore linter
+	return 0
 }
 
-func serverClientIP(xForwardedFor string) string {
-	if idx := strings.IndexByte(xForwardedFor, ','); idx >= 0 {
-		xForwardedFor = xForwardedFor[:idx]
-	}
-	return xForwardedFor
-}
+func serverClientIP(xForwardedFor string) string { _ = "STUB: not implemented"; return "" }
 
-func httpRoute(pattern string) string {
-	if idx := strings.IndexByte(pattern, '/'); idx >= 0 {
-		return pattern[idx:]
-	}
-	return ""
-}
+func httpRoute(pattern string) string { _ = "STUB: not implemented"; return "" }
 
 func netProtocol(proto string) (name string, version string) {
-	name, version, _ = strings.Cut(proto, "/")
-	switch name {
-	case "HTTP":
-		name = "http"
-	case "QUIC":
-		name = "quic"
-	case "SPDY":
-		name = "spdy"
-	default:
-		name = strings.ToLower(name)
-	}
-	return name, version
+	_ = "STUB: not implemented"
+	return "", ""
 }
 
 var methodLookup = map[string]attribute.KeyValue{
@@ -111,23 +56,12 @@ var methodLookup = map[string]attribute.KeyValue{
 	http.MethodTrace:   semconvNew.HTTPRequestMethodTrace,
 }
 
-func handleErr(err error) {
-	if err != nil {
-		otel.Handle(err)
-	}
-}
+func handleErr(err error) { _ = "STUB: not implemented"; return }
 
-func standardizeHTTPMethod(method string) string {
-	method = strings.ToUpper(method)
-	switch method {
-	case http.MethodConnect, http.MethodDelete, http.MethodGet, http.MethodHead, http.MethodOptions, http.MethodPatch, http.MethodPost, http.MethodPut, http.MethodTrace:
-	default:
-		method = "_OTHER"
-	}
-	return method
-}
+func standardizeHTTPMethod(method string) string { _ = "STUB: not implemented"; return "" }
 
 func durationToSeconds(d time.Duration) float64 {
+	_ = "STUB: not implemented"
 	// Use floating point division here for higher precision (instead of Seconds method).
-	return float64(d) / float64(time.Second)
+	return 0
 }

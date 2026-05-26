@@ -16,8 +16,6 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/baggage"
-	stdout "go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
-	"go.opentelemetry.io/otel/propagation"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.41.0"
 	"go.opentelemetry.io/otel/trace"
@@ -27,23 +25,14 @@ import (
 )
 
 func initTracer() (*sdktrace.TracerProvider, error) {
+	_ = "STUB: not implemented"
 	// Create stdout exporter to be able to retrieve
 	// the collected spans.
-	exporter, err := stdout.New(stdout.WithPrettyPrint())
-	if err != nil {
-		return nil, err
-	}
-
-	// For the demonstration, use sdktrace.AlwaysSample sampler to sample all traces.
-	// In a production application, use sdktrace.ProbabilitySampler with a desired probability.
-	tp := sdktrace.NewTracerProvider(
-		sdktrace.WithSampler(sdktrace.AlwaysSample()),
-		sdktrace.WithBatcher(exporter),
-	)
-	otel.SetTracerProvider(tp)
-	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
-	return tp, nil
+	return nil, nil
 }
+
+// For the demonstration, use sdktrace.AlwaysSample sampler to sample all traces.
+// In a production application, use sdktrace.ProbabilitySampler with a desired probability.
 
 func main() {
 	tp, err := initTracer()

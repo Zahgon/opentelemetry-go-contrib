@@ -12,9 +12,4 @@ var nativeDeviceCommandDuration = prometheus.NewHistogramVec(prometheus.Histogra
 	NativeHistogramBucketFactor: 1.1,
 }, []string{"device_type"})
 
-func nativeHistogramUsage(reg *prometheus.Registry) {
-	reg.MustRegister(nativeDeviceCommandDuration)
-
-	nativeDeviceCommandDuration.WithLabelValues("thermostat").Observe(0.35)
-	nativeDeviceCommandDuration.WithLabelValues("lock").Observe(0.85)
-}
+func nativeHistogramUsage(reg *prometheus.Registry) { _ = "STUB: not implemented"; return }

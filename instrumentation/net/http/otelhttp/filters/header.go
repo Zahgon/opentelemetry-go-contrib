@@ -4,31 +4,16 @@
 package filters // import "go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp/filters"
 
 import (
-	"net/http"
-	"net/textproto"
-	"slices"
-	"strings"
-
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 // Header returns a Filter that returns true if the request
 // includes a header k with a value equal to v.
-func Header(k, v string) otelhttp.Filter {
-	return func(r *http.Request) bool {
-		return slices.Contains(r.Header[textproto.CanonicalMIMEHeaderKey(k)], v)
-	}
-}
+func Header(k, v string) otelhttp.Filter { _ = "STUB: not implemented"; return *new(otelhttp.Filter) }
 
 // HeaderContains returns a Filter that returns true if the request
 // includes a header k with a value that contains v.
 func HeaderContains(k, v string) otelhttp.Filter {
-	return func(r *http.Request) bool {
-		for _, hv := range r.Header[textproto.CanonicalMIMEHeaderKey(k)] {
-			if strings.Contains(hv, v) {
-				return true
-			}
-		}
-		return false
-	}
+	_ = "STUB: not implemented"
+	return *new(otelhttp.Filter)
 }

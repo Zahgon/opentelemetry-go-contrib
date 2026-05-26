@@ -12,9 +12,4 @@ var deviceCommandDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 	Buckets: []float64{0.1, 0.25, 0.5, 1.0, 2.5, 5.0},
 }, []string{"device_type"})
 
-func prometheusHistogramUsage(reg *prometheus.Registry) {
-	reg.MustRegister(deviceCommandDuration)
-
-	deviceCommandDuration.WithLabelValues("thermostat").Observe(0.35)
-	deviceCommandDuration.WithLabelValues("lock").Observe(0.85)
-}
+func prometheusHistogramUsage(reg *prometheus.Registry) { _ = "STUB: not implemented"; return }

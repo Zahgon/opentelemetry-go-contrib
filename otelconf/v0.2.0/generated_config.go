@@ -2,10 +2,6 @@
 
 package otelconf
 
-import "encoding/json"
-import "fmt"
-import "reflect"
-
 type AttributeLimits struct {
 	// AttributeCountLimit corresponds to the JSON schema field
 	// "attribute_count_limit".
@@ -40,19 +36,7 @@ type BatchLogRecordProcessor struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *BatchLogRecordProcessor) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if _, ok := raw["exporter"]; raw != nil && !ok {
-		return fmt.Errorf("field exporter in BatchLogRecordProcessor: required")
-	}
-	type Plain BatchLogRecordProcessor
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = BatchLogRecordProcessor(plain)
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -75,22 +59,7 @@ type BatchSpanProcessor struct {
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *BatchSpanProcessor) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if _, ok := raw["exporter"]; raw != nil && !ok {
-		return fmt.Errorf("field exporter in BatchSpanProcessor: required")
-	}
-	type Plain BatchSpanProcessor
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = BatchSpanProcessor(plain)
-	return nil
-}
+func (j *BatchSpanProcessor) UnmarshalJSON(b []byte) error { _ = "STUB: not implemented"; return nil }
 
 type Common map[string]interface{}
 
@@ -264,65 +233,15 @@ var enumValues_OTLPMetricDefaultHistogramAggregation = []interface{}{
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *OTLPMetricDefaultHistogramAggregation) UnmarshalJSON(b []byte) error {
-	var v string
-	if err := json.Unmarshal(b, &v); err != nil {
-		return err
-	}
-	var ok bool
-	for _, expected := range enumValues_OTLPMetricDefaultHistogramAggregation {
-		if reflect.DeepEqual(v, expected) {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_OTLPMetricDefaultHistogramAggregation, v)
-	}
-	*j = OTLPMetricDefaultHistogramAggregation(v)
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *OTLPMetric) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if _, ok := raw["endpoint"]; raw != nil && !ok {
-		return fmt.Errorf("field endpoint in OTLPMetric: required")
-	}
-	if _, ok := raw["protocol"]; raw != nil && !ok {
-		return fmt.Errorf("field protocol in OTLPMetric: required")
-	}
-	type Plain OTLPMetric
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = OTLPMetric(plain)
-	return nil
-}
+func (j *OTLPMetric) UnmarshalJSON(b []byte) error { _ = "STUB: not implemented"; return nil }
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *OTLP) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if _, ok := raw["endpoint"]; raw != nil && !ok {
-		return fmt.Errorf("field endpoint in OTLP: required")
-	}
-	if _, ok := raw["protocol"]; raw != nil && !ok {
-		return fmt.Errorf("field protocol in OTLP: required")
-	}
-	type Plain OTLP
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = OTLP(plain)
-	return nil
-}
+func (j *OTLP) UnmarshalJSON(b []byte) error { _ = "STUB: not implemented"; return nil }
 
 type OpenTelemetryConfiguration struct {
 	// AttributeLimits corresponds to the JSON schema field "attribute_limits".
@@ -354,19 +273,7 @@ type OpenTelemetryConfiguration struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *OpenTelemetryConfiguration) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if _, ok := raw["file_format"]; raw != nil && !ok {
-		return fmt.Errorf("field file_format in OpenTelemetryConfiguration: required")
-	}
-	type Plain OpenTelemetryConfiguration
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = OpenTelemetryConfiguration(plain)
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -382,22 +289,7 @@ type PeriodicMetricReader struct {
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *PeriodicMetricReader) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if _, ok := raw["exporter"]; raw != nil && !ok {
-		return fmt.Errorf("field exporter in PeriodicMetricReader: required")
-	}
-	type Plain PeriodicMetricReader
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = PeriodicMetricReader(plain)
-	return nil
-}
+func (j *PeriodicMetricReader) UnmarshalJSON(b []byte) error { _ = "STUB: not implemented"; return nil }
 
 type Prometheus struct {
 	// Host corresponds to the JSON schema field "host".
@@ -433,22 +325,7 @@ type PullMetricReader struct {
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *PullMetricReader) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if _, ok := raw["exporter"]; raw != nil && !ok {
-		return fmt.Errorf("field exporter in PullMetricReader: required")
-	}
-	type Plain PullMetricReader
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = PullMetricReader(plain)
-	return nil
-}
+func (j *PullMetricReader) UnmarshalJSON(b []byte) error { _ = "STUB: not implemented"; return nil }
 
 type Resource struct {
 	// Attributes corresponds to the JSON schema field "attributes".
@@ -527,19 +404,7 @@ type SimpleLogRecordProcessor struct {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *SimpleLogRecordProcessor) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if _, ok := raw["exporter"]; raw != nil && !ok {
-		return fmt.Errorf("field exporter in SimpleLogRecordProcessor: required")
-	}
-	type Plain SimpleLogRecordProcessor
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SimpleLogRecordProcessor(plain)
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -549,22 +414,7 @@ type SimpleSpanProcessor struct {
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *SimpleSpanProcessor) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if _, ok := raw["exporter"]; raw != nil && !ok {
-		return fmt.Errorf("field exporter in SimpleSpanProcessor: required")
-	}
-	type Plain SimpleSpanProcessor
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = SimpleSpanProcessor(plain)
-	return nil
-}
+func (j *SimpleSpanProcessor) UnmarshalJSON(b []byte) error { _ = "STUB: not implemented"; return nil }
 
 type SpanExporter struct {
 	// Console corresponds to the JSON schema field "console".
@@ -672,21 +522,7 @@ var enumValues_ViewSelectorInstrumentType = []interface{}{
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *ViewSelectorInstrumentType) UnmarshalJSON(b []byte) error {
-	var v string
-	if err := json.Unmarshal(b, &v); err != nil {
-		return err
-	}
-	var ok bool
-	for _, expected := range enumValues_ViewSelectorInstrumentType {
-		if reflect.DeepEqual(v, expected) {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_ViewSelectorInstrumentType, v)
-	}
-	*j = ViewSelectorInstrumentType(v)
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -762,19 +598,4 @@ type Zipkin struct {
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *Zipkin) UnmarshalJSON(b []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	if _, ok := raw["endpoint"]; raw != nil && !ok {
-		return fmt.Errorf("field endpoint in Zipkin: required")
-	}
-	type Plain Zipkin
-	var plain Plain
-	if err := json.Unmarshal(b, &plain); err != nil {
-		return err
-	}
-	*j = Zipkin(plain)
-	return nil
-}
+func (j *Zipkin) UnmarshalJSON(b []byte) error { _ = "STUB: not implemented"; return nil }

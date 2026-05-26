@@ -4,22 +4,8 @@
 package host // import "go.opentelemetry.io/contrib/instrumentation/host"
 
 import (
-	"context"
-	"errors"
-	"fmt"
-	"math"
-	"os"
-	"sync"
-
-	"github.com/shirou/gopsutil/v4/cpu"
-	"github.com/shirou/gopsutil/v4/mem"
-	"github.com/shirou/gopsutil/v4/net"
-	"github.com/shirou/gopsutil/v4/process"
-	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/semconv/v1.41.0/processconv"
-	"go.opentelemetry.io/otel/semconv/v1.41.0/systemconv"
 )
 
 // ScopeName is the instrumentation scope name.
@@ -47,16 +33,13 @@ type Option interface {
 // reporting.  If this option is not used, the global metric.MeterProvider
 // will be used.  `provider` must be non-nil.
 func WithMeterProvider(provider metric.MeterProvider) Option {
-	return metricProviderOption{provider}
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 type metricProviderOption struct{ metric.MeterProvider }
 
-func (o metricProviderOption) apply(c *config) {
-	if o.MeterProvider != nil {
-		c.MeterProvider = o.MeterProvider
-	}
-}
+func (o metricProviderOption) apply(c *config) { _ = "STUB: not implemented"; return }
 
 // Attribute sets.
 var (
@@ -87,224 +70,37 @@ var (
 )
 
 // newConfig computes a config from a list of Options.
-func newConfig(opts ...Option) config {
-	c := config{
-		MeterProvider: otel.GetMeterProvider(),
-	}
-	for _, opt := range opts {
-		opt.apply(&c)
-	}
-	return c
-}
+func newConfig(opts ...Option) config { _ = "STUB: not implemented"; return *new(config) }
 
 // Start initializes reporting of host metrics using the supplied config.
-func Start(opts ...Option) error {
-	c := newConfig(opts...)
-	if c.MeterProvider == nil {
-		c.MeterProvider = otel.GetMeterProvider()
-	}
-	h := &host{
-		meter: c.MeterProvider.Meter(
-			ScopeName,
-			metric.WithInstrumentationVersion(Version),
-		),
-		config: c,
-	}
-	return h.register()
-}
+func Start(opts ...Option) error { _ = "STUB: not implemented"; return nil }
 
-func (h *host) register() error {
-	var (
-		err error
+func (h *host) register() error { _ = "STUB: not implemented"; return nil }
 
-		procCPUTime         processconv.CPUTime
-		procCPUTimeModeUser = metric.WithAttributes(
-			procCPUTime.AttrCPUMode(processconv.CPUModeUser),
-		)
-		procCPUTimeModeSystem = metric.WithAttributes(
-			procCPUTime.AttrCPUMode(processconv.CPUModeSystem),
-		)
+// lock prevents a race between batch observer and instrument registration.
 
-		cpuTime         systemconv.CPUTime
-		cpuTimeModeUser = metric.WithAttributes(
-			cpuTime.AttrCPUMode(systemconv.CPUModeUser),
-		)
-		cpuTimeModeSystem = metric.WithAttributes(
-			cpuTime.AttrCPUMode(systemconv.CPUModeSystem),
-		)
-		cpuTimeModeIdle = metric.WithAttributes(
-			cpuTime.AttrCPUMode(systemconv.CPUModeIdle),
-		)
-		cpuTimeModeOther = metric.WithAttributes(
-			cpuTime.AttrCPUMode(systemconv.CPUModeAttr("other")),
-		)
+// This follows the OpenTelemetry Collector's "hostmetrics"
+// receiver/hostmetricsreceiver/internal/scraper/processscraper
+// measures User and System IOwait time.
+// TODO: the Collector has per-OS compilation modules to support
+// specific metrics that are not universal.
 
-		memUse          systemconv.MemoryUsage
-		memUseStateFree = metric.WithAttributes(
-			memUse.AttrMemoryState(systemconv.MemoryStateFree),
-		)
-		memUseStateUsed = metric.WithAttributes(
-			memUse.AttrMemoryState(systemconv.MemoryStateUsed),
-		)
+// TODO(#244): "other" is a placeholder for actually dealing
+// with these states.  Do users actually want this
+// (unconditionally)?  How should we handle "iowait"
+// if not all systems expose it?  Should we break
+// these down by CPU?  If so, are users going to want
+// to aggregate in-process?  See:
+// https://github.com/open-telemetry/opentelemetry-go-contrib/issues/244
 
-		memUtil          systemconv.MemoryUtilization
-		memUtilStateFree = metric.WithAttributes(
-			memUtil.AttrMemoryState(systemconv.MemoryStateFree),
-		)
-		memUtilStateUsed = metric.WithAttributes(
-			memUtil.AttrMemoryState(systemconv.MemoryStateUsed),
-		)
+// Host memory usage
 
-		netIO              systemconv.NetworkIO
-		netIOStateTransmit = metric.WithAttributes(
-			netIO.AttrNetworkIODirection(systemconv.NetworkIODirectionTransmit),
-		)
-		netIOStateReceive = metric.WithAttributes(
-			netIO.AttrNetworkIODirection(systemconv.NetworkIODirectionReceive),
-		)
+// Host memory utilization
 
-		// lock prevents a race between batch observer and instrument registration.
-		lock sync.Mutex
-	)
+// Host network usage
+//
+// TODO: These can be broken down by network
+// interface, with similar questions to those posed
+// about per-CPU measurements above.
 
-	pid := os.Getpid()
-	if pid > math.MaxInt32 || pid < math.MinInt32 {
-		return fmt.Errorf("invalid process ID: %d", pid)
-	}
-	proc, err := process.NewProcess(int32(pid))
-	if err != nil {
-		return fmt.Errorf("could not find this process: %w", err)
-	}
-
-	lock.Lock()
-	defer lock.Unlock()
-
-	if procCPUTime, err = processconv.NewCPUTime(h.meter); err != nil {
-		return err
-	}
-	if cpuTime, err = systemconv.NewCPUTime(h.meter); err != nil {
-		return err
-	}
-	if memUse, err = systemconv.NewMemoryUsage(h.meter); err != nil {
-		return err
-	}
-	if memUtil, err = systemconv.NewMemoryUtilization(h.meter); err != nil {
-		return err
-	}
-	if netIO, err = systemconv.NewNetworkIO(h.meter); err != nil {
-		return err
-	}
-
-	_, err = h.meter.RegisterCallback(
-		func(ctx context.Context, o metric.Observer) error {
-			lock.Lock()
-			defer lock.Unlock()
-
-			// This follows the OpenTelemetry Collector's "hostmetrics"
-			// receiver/hostmetricsreceiver/internal/scraper/processscraper
-			// measures User and System IOwait time.
-			// TODO: the Collector has per-OS compilation modules to support
-			// specific metrics that are not universal.
-			processTimes, err := proc.TimesWithContext(ctx)
-			if err != nil {
-				return err
-			}
-
-			hostTimeSlice, err := cpu.TimesWithContext(ctx, false)
-			if err != nil {
-				return err
-			}
-			if len(hostTimeSlice) != 1 {
-				return errors.New("host CPU usage: incorrect summary count")
-			}
-
-			vmStats, err := mem.VirtualMemoryWithContext(ctx)
-			if err != nil {
-				return err
-			}
-
-			ioStats, err := net.IOCountersWithContext(ctx, false)
-			if err != nil {
-				return err
-			}
-			if len(ioStats) != 1 {
-				return errors.New("host network usage: incorrect summary count")
-			}
-
-			hostTime := hostTimeSlice[0]
-			o.ObserveFloat64(procCPUTime.Inst(), processTimes.User, procCPUTimeModeUser)
-			o.ObserveFloat64(procCPUTime.Inst(), processTimes.System, procCPUTimeModeSystem)
-
-			o.ObserveFloat64(cpuTime.Inst(), hostTime.User, cpuTimeModeUser)
-			o.ObserveFloat64(cpuTime.Inst(), hostTime.System, cpuTimeModeSystem)
-
-			// TODO(#244): "other" is a placeholder for actually dealing
-			// with these states.  Do users actually want this
-			// (unconditionally)?  How should we handle "iowait"
-			// if not all systems expose it?  Should we break
-			// these down by CPU?  If so, are users going to want
-			// to aggregate in-process?  See:
-			// https://github.com/open-telemetry/opentelemetry-go-contrib/issues/244
-			other := hostTime.Nice +
-				hostTime.Iowait +
-				hostTime.Irq +
-				hostTime.Softirq +
-				hostTime.Steal +
-				hostTime.Guest +
-				hostTime.GuestNice
-
-			o.ObserveFloat64(cpuTime.Inst(), other, cpuTimeModeOther)
-			o.ObserveFloat64(cpuTime.Inst(), hostTime.Idle, cpuTimeModeIdle)
-
-			// Host memory usage
-			o.ObserveInt64(memUse.Inst(), clampInt64(vmStats.Used), memUseStateUsed)
-			o.ObserveInt64(memUse.Inst(), clampInt64(vmStats.Available), memUseStateFree)
-
-			// Host memory utilization
-			o.ObserveFloat64(
-				memUtil.Inst(),
-				float64(vmStats.Used)/float64(vmStats.Total), memUtilStateUsed,
-			)
-			o.ObserveFloat64(
-				memUtil.Inst(),
-				float64(vmStats.Available)/float64(vmStats.Total),
-				memUtilStateFree,
-			)
-
-			// Host network usage
-			//
-			// TODO: These can be broken down by network
-			// interface, with similar questions to those posed
-			// about per-CPU measurements above.
-			o.ObserveInt64(
-				netIO.Inst(),
-				clampInt64(ioStats[0].BytesSent),
-				netIOStateTransmit,
-			)
-			o.ObserveInt64(
-				netIO.Inst(),
-				clampInt64(ioStats[0].BytesRecv),
-				netIOStateReceive,
-			)
-
-			return nil
-		},
-		procCPUTime.Inst(),
-		cpuTime.Inst(),
-		memUse.Inst(),
-		memUtil.Inst(),
-		netIO.Inst(),
-	)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func clampInt64(v uint64) int64 {
-	if v > math.MaxInt64 {
-		return math.MaxInt64
-	}
-	return int64(v)
-}
+func clampInt64(v uint64) int64 { _ = "STUB: not implemented"; return 0 }

@@ -5,13 +5,10 @@ package hetzner // import "go.opentelemetry.io/contrib/detectors/hetzner"
 
 import (
 	"context"
-	"fmt"
-	"strconv"
 
 	hcloudmeta "github.com/hetznercloud/hcloud-go/v2/hcloud/metadata"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/resource"
-	semconv "go.opentelemetry.io/otel/semconv/v1.41.0"
 )
 
 // Compile-time interface assertion.
@@ -34,13 +31,18 @@ type Option interface {
 
 type optionFunc func(*config)
 
-func (f optionFunc) apply(c *config) { f(c) }
+func (f optionFunc) apply(c *config) {
+	_ = "STUB: not implemented"
 
-// WithAttributeFilter sets a filter that controls which detected attributes are
-// included in the returned resource. Only attributes for which filter returns
-// true are included. By default all attributes are included.
+	// WithAttributeFilter sets a filter that controls which detected attributes are
+	// included in the returned resource. Only attributes for which filter returns
+	// true are included. By default all attributes are included.
+	return
+}
+
 func WithAttributeFilter(filter attribute.Filter) Option {
-	return optionFunc(func(c *config) { c.filter = filter })
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // ResourceDetector collects resource information of Hetzner Cloud servers.
@@ -51,13 +53,7 @@ type ResourceDetector struct {
 
 // NewResourceDetector returns a [resource.Detector] that detects resource
 // attributes on Hetzner Cloud servers.
-func NewResourceDetector(opts ...Option) *ResourceDetector {
-	var cfg config
-	for _, opt := range opts {
-		opt.apply(&cfg)
-	}
-	return &ResourceDetector{client: newHcloudClient(), cfg: cfg}
-}
+func NewResourceDetector(opts ...Option) *ResourceDetector { _ = "STUB: not implemented"; return nil }
 
 // Detect detects resource attributes of the Hetzner Cloud server the process
 // is running on. It returns an empty resource and no error when not running on
@@ -65,59 +61,6 @@ func NewResourceDetector(opts ...Option) *ResourceDetector {
 // but some attributes cannot be retrieved, a partial resource is returned
 // together with [resource.ErrPartialResource].
 func (d *ResourceDetector) Detect(_ context.Context) (*resource.Resource, error) {
-	if !d.client.IsHcloudServer() {
-		return resource.Empty(), nil
-	}
-
-	attrs := []attribute.KeyValue{
-		semconv.CloudProviderHetzner,
-		semconv.CloudPlatformHetznerCloudServer,
-	}
-
-	var errs []error
-
-	id, err := d.client.InstanceID()
-	if err != nil {
-		errs = append(errs, fmt.Errorf("instance ID: %w", err))
-	} else {
-		attrs = append(attrs, semconv.HostID(strconv.FormatInt(id, 10)))
-	}
-
-	hostname, err := d.client.Hostname()
-	if err != nil {
-		errs = append(errs, fmt.Errorf("hostname: %w", err))
-	} else {
-		attrs = append(attrs, semconv.HostName(hostname))
-	}
-
-	region, err := d.client.Region()
-	if err != nil {
-		errs = append(errs, fmt.Errorf("region: %w", err))
-	} else {
-		attrs = append(attrs, semconv.CloudRegion(region))
-	}
-
-	az, err := d.client.AvailabilityZone()
-	if err != nil {
-		errs = append(errs, fmt.Errorf("availability zone: %w", err))
-	} else {
-		attrs = append(attrs, semconv.CloudAvailabilityZone(az))
-	}
-
-	if d.cfg.filter != nil {
-		filtered := attrs[:0]
-		for _, kv := range attrs {
-			if d.cfg.filter(kv) {
-				filtered = append(filtered, kv)
-			}
-		}
-		attrs = filtered
-	}
-
-	res := resource.NewWithAttributes(semconv.SchemaURL, attrs...)
-
-	if len(errs) > 0 {
-		return res, fmt.Errorf("%w: %v", resource.ErrPartialResource, errs)
-	}
-	return res, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }

@@ -8,7 +8,6 @@ package xray // import "go.opentelemetry.io/contrib/propagators/aws/xray"
 import (
 	"context"
 	"errors"
-	"strings"
 
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
@@ -56,122 +55,44 @@ var _ propagation.TextMapPropagator = &Propagator{}
 
 // Inject injects a context to the carrier following AWS X-Ray format.
 func (Propagator) Inject(ctx context.Context, carrier propagation.TextMapCarrier) {
-	sc := trace.SpanFromContext(ctx).SpanContext()
-	if !sc.TraceID().IsValid() || !sc.SpanID().IsValid() {
-		return
-	}
-	otTraceID := sc.TraceID().String()
-	xrayTraceID := traceIDVersion + traceIDDelimiter + otTraceID[0:traceIDFirstPartLength] +
-		traceIDDelimiter + otTraceID[traceIDFirstPartLength:]
-	parentID := sc.SpanID()
-	samplingFlag := notSampled
-	if sc.TraceFlags().IsSampled() {
-		samplingFlag = isSampled
-	}
-	headers := []string{
-		traceIDKey, kvDelimiter, xrayTraceID, traceHeaderDelimiter, parentIDKey,
-		kvDelimiter, parentID.String(), traceHeaderDelimiter, sampleFlagKey, kvDelimiter, samplingFlag,
-	}
-
-	carrier.Set(traceHeaderKey, strings.Join(headers, ""))
+	_ = "STUB: not implemented"
+	return
 }
 
 // Extract gets a context from the carrier if it contains AWS X-Ray headers.
 func (Propagator) Extract(ctx context.Context, carrier propagation.TextMapCarrier) context.Context {
+	_ = "STUB: not implemented"
 	// extract tracing information
-	if header := carrier.Get(traceHeaderKey); header != "" {
-		sc, err := extract(header)
-		if err == nil && sc.IsValid() {
-			return trace.ContextWithRemoteSpanContext(ctx, sc)
-		}
-	}
-	return ctx
+	return *new(context.Context)
 }
 
 // extract extracts Span Context from context.
 func extract(headerVal string) (trace.SpanContext, error) {
-	var (
-		scc            = trace.SpanContextConfig{}
-		err            error
-		delimiterIndex int
-		part           string
-	)
-	pos := 0
-	for pos < len(headerVal) {
-		delimiterIndex = indexOf(headerVal, traceHeaderDelimiter, pos)
-		if delimiterIndex >= 0 {
-			part = headerVal[pos:delimiterIndex]
-			pos = delimiterIndex + 1
-		} else {
-			// last part
-			part = strings.TrimSpace(headerVal[pos:])
-			pos = len(headerVal)
-		}
-		_, after, ok := strings.Cut(part, kvDelimiter)
-		if !ok {
-			return empty, errInvalidTraceHeader
-		}
-		value := after
-		switch {
-		case strings.HasPrefix(part, traceIDKey):
-			scc.TraceID, err = parseTraceID(value)
-			if err != nil {
-				return empty, err
-			}
-		case strings.HasPrefix(part, parentIDKey):
-			// extract parentId
-			scc.SpanID, err = trace.SpanIDFromHex(value)
-			if err != nil {
-				return empty, errInvalidSpanIDLength
-			}
-		case strings.HasPrefix(part, sampleFlagKey):
-			// extract traceflag
-			scc.TraceFlags = parseTraceFlag(value)
-		}
-	}
-	return trace.NewSpanContext(scc), nil
+	_ = "STUB: not implemented"
+	return *new(trace.SpanContext), nil
 }
 
+// last part
+
+// extract parentId
+
+// extract traceflag
+
 // indexOf returns position of the first occurrence of a substr in str starting at pos index.
-func indexOf(str, substr string, pos int) int {
-	index := strings.Index(str[pos:], substr)
-	if index > -1 {
-		index += pos
-	}
-	return index
-}
+func indexOf(str, substr string, pos int) int { _ = "STUB: not implemented"; return 0 }
 
 // parseTraceID returns trace ID if  valid else return invalid trace ID.
 func parseTraceID(xrayTraceID string) (trace.TraceID, error) {
-	if len(xrayTraceID) != traceIDLength {
-		return empty.TraceID(), errLengthTraceIDHeader
-	}
-	if !strings.HasPrefix(xrayTraceID, traceIDVersion) {
-		return empty.TraceID(), errInvalidTraceIDVersion
-	}
-
-	if xrayTraceID[traceIDDelimitterIndex1:traceIDDelimitterIndex1+1] != traceIDDelimiter ||
-		xrayTraceID[traceIDDelimitterIndex2:traceIDDelimitterIndex2+1] != traceIDDelimiter {
-		return empty.TraceID(), errMalformedTraceID
-	}
-
-	epochPart := xrayTraceID[traceIDDelimitterIndex1+1 : traceIDDelimitterIndex2]
-	uniquePart := xrayTraceID[traceIDDelimitterIndex2+1 : traceIDLength]
-
-	result := epochPart + uniquePart
-	return trace.TraceIDFromHex(result)
+	_ = "STUB: not implemented"
+	return *new(trace.TraceID), nil
 }
 
 // parseTraceFlag returns a parsed trace flag.
 func parseTraceFlag(xraySampledFlag string) trace.TraceFlags {
+	_ = "STUB: not implemented"
 	// Use a direct comparison here (#7262).
-	if xraySampledFlag == isSampled {
-		return trace.FlagsSampled
-	}
-	return trace.FlagsSampled.WithSampled(false)
+	return *new(trace.TraceFlags)
 }
 
 // Fields returns list of fields used by HTTPTextFormat.
-func (Propagator) Fields() []string {
-	return []string{traceHeaderKey}
-}
+func (Propagator) Fields() []string { _ = "STUB: not implemented"; return nil }

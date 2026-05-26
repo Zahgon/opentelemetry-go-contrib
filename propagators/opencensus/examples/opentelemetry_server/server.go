@@ -8,12 +8,9 @@ package main // import "go.opentelemetry.io/otel/bridge/opencensus/examples/grpc
 import (
 	"context"
 	"log"
-	"math/rand"
 	"net"
-	"time"
 
 	pb "go.opencensus.io/examples/grpc/proto"
-	"go.opencensus.io/trace"
 	"go.opentelemetry.io/otel"
 	stdout "go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -30,11 +27,11 @@ type server struct{}
 
 // SayHello implements helloworld.GreeterServer.
 func (*server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
-	_, span := trace.StartSpan(ctx, "sleep")
-	time.Sleep(time.Duration(rand.Float64() * float64(time.Second))) //nolint:gosec // Ignoring G404: Use of weak random number generator (math/rand instead of crypto/rand)
-	span.End()
-	return &pb.HelloReply{Message: "Hello " + in.Name}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+//nolint:gosec // Ignoring G404: Use of weak random number generator (math/rand instead of crypto/rand)
 
 func main() {
 	lis, err := (&net.ListenConfig{}).Listen(context.Background(), "tcp", address)

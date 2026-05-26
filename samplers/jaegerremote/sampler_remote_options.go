@@ -19,10 +19,6 @@
 package jaegerremote // import "go.opentelemetry.io/contrib/samplers/jaegerremote"
 
 import (
-	"fmt"
-	"os"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -42,91 +38,14 @@ type config struct {
 }
 
 func getEnvOptions() ([]Option, []error) {
-	var options []Option
+	_ = "STUB: not implemented"
+
 	// list of errors which will be logged once logger is set by the user
-	var errs []error
-
-	rawEnvArgs := os.Getenv("OTEL_TRACES_SAMPLER_ARG")
-	if rawEnvArgs == "" {
-		return nil, nil
-	}
-
-	args := strings.SplitSeq(rawEnvArgs, ",")
-	for arg := range args {
-		keyValue := strings.Split(arg, "=")
-		if len(keyValue) != 2 {
-			errs = append(errs, fmt.Errorf("argument %s is not of type '<key>=<value>'", arg))
-			continue
-		}
-		key := strings.Trim(keyValue[0], " ")
-		value := strings.Trim(keyValue[1], " ")
-
-		switch key {
-		case "endpoint":
-			options = append(options, WithSamplingServerURL(value))
-		case "pollingIntervalMs":
-			intervalMs, err := strconv.Atoi(value)
-			if err != nil {
-				errs = append(errs, fmt.Errorf("%s parsing failed with :%w", key, err))
-				continue
-			}
-			options = append(options, WithSamplingRefreshInterval(time.Duration(intervalMs)*time.Millisecond))
-		case "initialSamplingRate":
-			samplingRate, err := strconv.ParseFloat(value, 64)
-			if err != nil {
-				errs = append(errs, fmt.Errorf("%s parsing failed with :%w", key, err))
-				continue
-			}
-			options = append(options, WithInitialSampler(trace.TraceIDRatioBased(samplingRate)))
-		default:
-			errs = append(errs, fmt.Errorf("invalid argument %s in OTEL_TRACE_SAMPLER_ARG", key))
-		}
-	}
-	return options, errs
+	return nil, nil
 }
 
 // newConfig returns an appropriately configured config.
-func newConfig(options ...Option) config {
-	c := config{
-		samplingServerURL:       defaultSamplingServerURL,
-		samplingRefreshInterval: defaultSamplingRefreshInterval,
-		samplingFetcher:         newHTTPSamplingStrategyFetcher(defaultSamplingServerURL),
-		samplingParser:          new(samplingStrategyParserImpl),
-		posParams: perOperationSamplerParams{
-			MaxOperations:            defaultSamplingMaxOperations,
-			OperationNameLateBinding: defaultSamplingOperationNameLateBinding,
-		},
-		logger: logr.Discard(),
-	}
-
-	envOptions, errs := getEnvOptions()
-	for _, option := range envOptions {
-		option.apply(&c)
-	}
-
-	for _, option := range options {
-		option.apply(&c)
-	}
-
-	for _, err := range errs {
-		c.logger.Error(err, "env variable parsing failure")
-	}
-	c.updaters = []samplerUpdater{
-		&perOperationSamplerUpdater{
-			MaxOperations:            c.posParams.MaxOperations,
-			OperationNameLateBinding: c.posParams.OperationNameLateBinding,
-			attributesDisabled:       c.attributesDisabled,
-		},
-		&probabilisticSamplerUpdater{attributesDisabled: c.attributesDisabled},
-		&rateLimitingSamplerUpdater{attributesDisabled: c.attributesDisabled},
-	}
-
-	if c.sampler == nil {
-		c.sampler = newProbabilisticSampler(0.001, c.attributesDisabled)
-	}
-
-	return c
-}
+func newConfig(options ...Option) config { _ = "STUB: not implemented"; return *new(config) }
 
 // Option applies configuration settings to a Sampler.
 type Option interface {
@@ -136,77 +55,61 @@ type Option interface {
 type optionFunc func(*config)
 
 func (fn optionFunc) apply(c *config) {
-	fn(c)
+	_ = "STUB: not implemented"
+
+	// WithInitialSampler creates a Option that sets the initial sampler
+	// to use before a remote sampler is created and used.
+	return
 }
 
-// WithInitialSampler creates a Option that sets the initial sampler
-// to use before a remote sampler is created and used.
 func WithInitialSampler(sampler trace.Sampler) Option {
-	return optionFunc(func(c *config) {
-		c.sampler = sampler
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithSamplingServerURL creates a Option that sets the sampling server url
 // of the local agent that contains the sampling strategies.
 func WithSamplingServerURL(samplingServerURL string) Option {
-	return optionFunc(func(c *config) {
-		c.samplingServerURL = samplingServerURL
-		// The default port of jaeger agent is 5778, but there are other ports specified by the user, so the sampling address and fetch address are strongly bound
-		c.samplingFetcher = newHTTPSamplingStrategyFetcher(samplingServerURL)
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
+
+// The default port of jaeger agent is 5778, but there are other ports specified by the user, so the sampling address and fetch address are strongly bound
 
 // WithMaxOperations creates a Option that sets the maximum number of
 // operations the sampler will keep track of.
-func WithMaxOperations(maxOperations int) Option {
-	return optionFunc(func(c *config) {
-		c.posParams.MaxOperations = maxOperations
-	})
-}
+func WithMaxOperations(maxOperations int) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithOperationNameLateBinding creates a Option that sets the respective
 // field in the perOperationSamplerParams.
 func WithOperationNameLateBinding(enable bool) Option {
-	return optionFunc(func(c *config) {
-		c.posParams.OperationNameLateBinding = enable
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithSamplingRefreshInterval creates a Option that sets how often the
 // sampler will poll local agent for the appropriate sampling strategy.
 func WithSamplingRefreshInterval(samplingRefreshInterval time.Duration) Option {
-	return optionFunc(func(c *config) {
-		c.samplingRefreshInterval = samplingRefreshInterval
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithLogger configures the sampler to log operation and debug information with logger.
-func WithLogger(logger logr.Logger) Option {
-	return optionFunc(func(c *config) {
-		c.logger = logger
-	})
-}
+func WithLogger(logger logr.Logger) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithSamplingStrategyFetcher creates an Option that initializes the sampling strategy fetcher.
 // Custom fetcher can be used for setting custom headers, timeouts, etc., or getting
 // sampling strategies from a different source, like files.
 func WithSamplingStrategyFetcher(fetcher SamplingStrategyFetcher) Option {
-	return optionFunc(func(c *config) {
-		c.samplingFetcher = fetcher
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithAttributesDisabled configures the sampler to disable setting attributes jaeger.sampler.type and jaeger.sampler.param.
-func WithAttributesDisabled() Option {
-	return optionFunc(func(c *config) {
-		c.attributesDisabled = true
-	})
-}
+func WithAttributesDisabled() Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // samplingStrategyParser creates a Option that initializes sampling strategy parser.
 func withSamplingStrategyParser(parser samplingStrategyParser) Option {
-	return optionFunc(func(c *config) {
-		c.samplingParser = parser
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }

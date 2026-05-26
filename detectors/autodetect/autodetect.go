@@ -8,8 +8,6 @@ package autodetect // import "go.opentelemetry.io/contrib/detectors/autodetect"
 import (
 	"context"
 	"errors"
-	"fmt"
-	"sort"
 	"sync"
 
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -161,29 +159,10 @@ var (
 type ID string
 
 // Register registers a new resource detector function with the given ID.
-func Register(id ID, fn func() resource.Detector) {
-	registryMu.Lock()
-	defer registryMu.Unlock()
-	if _, exists := registry[id]; exists {
-		panic("detector already registered: " + id)
-	}
-	registry[id] = fn
-}
+func Register(id ID, fn func() resource.Detector) { _ = "STUB: not implemented"; return }
 
 // Registered returns a sorted slice of all registered resource detector IDs.
-func Registered() []ID {
-	registryMu.Lock()
-	defer registryMu.Unlock()
-	out := make([]ID, 0, len(registry))
-	for id := range registry {
-		out = append(out, id)
-	}
-
-	sort.SliceStable(out, func(i, j int) bool {
-		return out[i] < out[j]
-	})
-	return out
-}
+func Registered() []ID { _ = "STUB: not implemented"; return nil }
 
 // optDetector is a resource.Detector that uses a resource.Option to
 // create a resource.Resource. This is useful for detectors that
@@ -199,13 +178,15 @@ var _ resource.Detector = optDetector{}
 // optFactory returns a function that creates an resource.Detector factory
 // function with the given resource.Option.
 func optFactory(opt resource.Option) func() resource.Detector {
-	return func() resource.Detector { return optDetector{opt: opt} }
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Detect returns the resource.Resource created by the resource.Option passed
 // to the optDetector.
 func (d optDetector) Detect(ctx context.Context) (*resource.Resource, error) {
-	return resource.New(ctx, d.opt)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // composite is a [resource.Detector] that composes multiple
@@ -218,9 +199,7 @@ var _ resource.Detector = &composite{}
 
 // newComposite returns a new composite detector that runs the provided
 // detectors in parallel and merges their results.
-func newComposite(detectors []resource.Detector) *composite {
-	return &composite{detectors: detectors}
-}
+func newComposite(detectors []resource.Detector) *composite { _ = "STUB: not implemented"; return nil }
 
 // Detect runs all the detectors in parallel and merges the results into a
 // single resource.Resource. If any detector returns an error, it is
@@ -231,8 +210,8 @@ func newComposite(detectors []resource.Detector) *composite {
 // error indicating the conflict (see
 // [resource.ErrSchemaURLConflict] for more information).
 func (c *composite) Detect(ctx context.Context) (*resource.Resource, error) {
-	out := <-mergeDetections(doDetect(ctx, c.detectors))
-	return out.res, out.err
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // detection is the result of a [resource.Detector] detection.
@@ -245,22 +224,8 @@ type detection struct {
 // detections are sent on the returned channel, and the channel is closed once
 // all detections are complete.
 func doDetect(ctx context.Context, detectors []resource.Detector) <-chan detection {
-	detected := make(chan detection, len(detectors))
-	go func() {
-		var wg sync.WaitGroup
-		for _, detector := range detectors {
-			wg.Add(1)
-			go func(d resource.Detector) {
-				defer wg.Done()
-				r, e := d.Detect(ctx)
-				detected <- detection{res: r, err: e}
-			}(detector)
-		}
-
-		wg.Wait()
-		close(detected)
-	}()
-	return detected
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // mergeDetections merges the results of multiple detections received on the in
@@ -272,26 +237,9 @@ func doDetect(ctx context.Context, detectors []resource.Detector) <-chan detecti
 // resource.Resource will be a partial resource with an
 // error indicating the conflict (see
 // [resource.ErrSchemaURLConflict] for more information).
-func mergeDetections(in <-chan detection) <-chan detection {
-	merged := make(chan detection, 1)
-	go func() {
-		m := detection{res: resource.Empty()}
-		for d := range in {
-			m.err = errors.Join(m.err, d.err)
+func mergeDetections(in <-chan detection) <-chan detection { _ = "STUB: not implemented"; return nil }
 
-			var err error
-			m.res, err = resource.Merge(m.res, d.res)
-			if err != nil {
-				// Merge errors are not recoverable.
-				m.res, m.err = nil, err
-				break
-			}
-		}
-		merged <- m
-		close(merged)
-	}()
-	return merged
-}
+// Merge errors are not recoverable.
 
 // ErrUnknownDetector is returned when an unknown resource detector ID is
 // requested.
@@ -303,22 +251,6 @@ var ErrUnknownDetector = errors.New("unknown resource detector")
 // resource from each detector when Detect is called. The order of the merge is
 // not guaranteed.
 func Detector(ids ...ID) (resource.Detector, error) {
-	registryMu.Lock()
-	defer registryMu.Unlock()
-
-	var (
-		detectors []resource.Detector
-		err       error
-	)
-
-	for _, id := range ids {
-		fn, exists := registry[id]
-		if !exists {
-			e := fmt.Errorf("%w: %s", ErrUnknownDetector, id)
-			err = errors.Join(err, e)
-			continue
-		}
-		detectors = append(detectors, fn())
-	}
-	return newComposite(detectors), err
+	_ = "STUB: not implemented"
+	return *new(resource.Detector), nil
 }

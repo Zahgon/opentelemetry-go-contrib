@@ -5,13 +5,13 @@ package hetzner // import "go.opentelemetry.io/contrib/detectors/hetzner"
 
 // Version is the current release version of the Hetzner resource detector.
 func Version() string {
-	return "0.15.0"
+	_ = "STUB: not implemented"
+
 	// This string is updated by the pre_release.sh script during release
+	return ""
 }
 
 // SemVersion is the semantic version to be supplied to tracer/meter creation.
 //
 // Deprecated: Use [Version] instead.
-func SemVersion() string {
-	return Version()
-}
+func SemVersion() string { _ = "STUB: not implemented"; return "" }

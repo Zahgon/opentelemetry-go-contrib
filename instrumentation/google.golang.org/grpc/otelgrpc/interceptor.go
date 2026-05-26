@@ -6,32 +6,15 @@ package otelgrpc // import "go.opentelemetry.io/contrib/instrumentation/google.g
 // gRPC tracing middleware
 // https://opentelemetry.io/docs/specs/semconv/rpc/
 import (
-	"net"
-	"strconv"
-
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
-	semconv "go.opentelemetry.io/otel/semconv/v1.41.0"
-	grpc_codes "google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 // serverAddrAttrs returns the server address attributes for the hostport.
-func serverAddrAttrs(hostport string) []attribute.KeyValue {
-	h, pStr, err := net.SplitHostPort(hostport)
-	if err != nil {
-		// The server.address attribute is required.
-		return []attribute.KeyValue{semconv.ServerAddress(hostport)}
-	}
-	p, err := strconv.Atoi(pStr)
-	if err != nil {
-		return []attribute.KeyValue{semconv.ServerAddress(h)}
-	}
-	return []attribute.KeyValue{
-		semconv.ServerAddress(h),
-		semconv.ServerPort(p),
-	}
-}
+func serverAddrAttrs(hostport string) []attribute.KeyValue { _ = "STUB: not implemented"; return nil }
+
+// The server.address attribute is required.
 
 // serverStatus returns a span status code and message for a given gRPC
 // status code. It maps specific gRPC status codes to a corresponding span
@@ -43,15 +26,6 @@ func serverAddrAttrs(hostport string) []attribute.KeyValue {
 // and the message from the gRPC status. Otherwise, it returns a span status
 // code of Unset and an empty message.
 func serverStatus(grpcStatus *status.Status) (codes.Code, string) {
-	switch grpcStatus.Code() {
-	case grpc_codes.Unknown,
-		grpc_codes.DeadlineExceeded,
-		grpc_codes.Unimplemented,
-		grpc_codes.Internal,
-		grpc_codes.Unavailable,
-		grpc_codes.DataLoss:
-		return codes.Error, grpcStatus.Message()
-	default:
-		return codes.Unset, ""
-	}
+	_ = "STUB: not implemented"
+	return *new(codes.Code), ""
 }

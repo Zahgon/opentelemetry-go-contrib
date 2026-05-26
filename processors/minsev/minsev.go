@@ -23,17 +23,8 @@ import (
 // If downstream is nil a default No-Op [log.Processor] is used. The returned
 // processor will not be enabled for nor emit any records.
 func NewLogProcessor(downstream log.Processor, severity Severitier) *LogProcessor {
-	if downstream == nil {
-		downstream = defaultProcessor
-	}
-	if severity == nil {
-		severity = SeverityInfo
-	}
-	return &LogProcessor{
-		Processor: downstream,
-		sev:       severity,
-		wrapped:   downstream,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // LogProcessor is an [log.Processor] implementation that wraps another
@@ -58,9 +49,7 @@ var _ log.Processor = (*LogProcessor)(nil)
 // of record is greater than or equal to p.Minimum. Otherwise, record is
 // dropped.
 func (p *LogProcessor) OnEmit(ctx context.Context, record *log.Record) error {
-	if record.Severity() >= p.sev.Severity() {
-		return p.Processor.OnEmit(ctx, record)
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -68,19 +57,21 @@ func (p *LogProcessor) OnEmit(ctx context.Context, record *log.Record) error {
 // severity of param is greater than or equal to p.Minimum. Otherwise false is
 // returned.
 func (p *LogProcessor) Enabled(ctx context.Context, param log.EnabledParameters) bool {
-	sev := param.Severity
-	if p.wrapped != nil {
-		return sev >= p.sev.Severity() &&
-			p.wrapped.Enabled(ctx, param)
-	}
-	return sev >= p.sev.Severity()
+	_ = "STUB: not implemented"
+	return false
 }
 
 var defaultProcessor = noopProcessor{}
 
 type noopProcessor struct{}
 
-func (noopProcessor) OnEmit(context.Context, *log.Record) error           { return nil }
-func (noopProcessor) Enabled(context.Context, log.EnabledParameters) bool { return false }
-func (noopProcessor) Shutdown(context.Context) error                      { return nil }
-func (noopProcessor) ForceFlush(context.Context) error                    { return nil }
+func (noopProcessor) OnEmit(context.Context, *log.Record) error {
+	_ = "STUB: not implemented"
+	return nil
+}
+func (noopProcessor) Enabled(context.Context, log.EnabledParameters) bool {
+	_ = "STUB: not implemented"
+	return false
+}
+func (noopProcessor) Shutdown(context.Context) error   { _ = "STUB: not implemented"; return nil }
+func (noopProcessor) ForceFlush(context.Context) error { _ = "STUB: not implemented"; return nil }

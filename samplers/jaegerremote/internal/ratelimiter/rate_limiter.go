@@ -52,63 +52,34 @@ type RateLimiter struct {
 
 // NewRateLimiter creates a new RateLimiter.
 func NewRateLimiter(creditsPerSecond, maxBalance float64) *RateLimiter {
-	balance := maxBalance
-	if creditsPerSecond == 0 {
-		balance = 0
-	}
-
-	return &RateLimiter{
-		creditsPerSecond: creditsPerSecond,
-		balance:          balance,
-		maxBalance:       maxBalance,
-		lastTick:         time.Now(),
-		timeNow:          time.Now,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // CheckCredit tries to reduce the current balance by itemCost provided that the current balance
 // is not lest than itemCost.
-func (rl *RateLimiter) CheckCredit(itemCost float64) bool {
-	rl.lock.Lock()
-	defer rl.lock.Unlock()
+func (rl *RateLimiter) CheckCredit(itemCost float64) bool { _ = "STUB: not implemented"; return false }
 
-	// if we have enough credits to pay for current item, then reduce balance and allow
-	if rl.balance >= itemCost {
-		rl.balance -= itemCost
-		return true
-	}
-	// otherwise check if balance can be increased due to time elapsed, and try again
-	rl.updateBalance()
-	if rl.balance >= itemCost {
-		rl.balance -= itemCost
-		return true
-	}
-	return false
-}
+// if we have enough credits to pay for current item, then reduce balance and allow
+
+// otherwise check if balance can be increased due to time elapsed, and try again
 
 // updateBalance recalculates current balance based on time elapsed. Must be called while holding a lock.
 func (rl *RateLimiter) updateBalance() {
+	_ = "STUB: not implemented"
 	// calculate how much time passed since the last tick, and update current tick
-	currentTime := rl.timeNow()
-	elapsedTime := currentTime.Sub(rl.lastTick)
-	rl.lastTick = currentTime
-	// calculate how much credit have we accumulated since the last tick
-	rl.balance += elapsedTime.Seconds() * rl.creditsPerSecond
-	if rl.balance > rl.maxBalance {
-		rl.balance = rl.maxBalance
-	}
+	return
 }
+
+// calculate how much credit have we accumulated since the last tick
 
 // Update changes the main parameters of the rate limiter in-place, while retaining
 // the current accumulated balance (pro-rated to the new maxBalance value). Using this method
 // instead of creating a new rate limiter helps to avoid thundering herd when sampling
 // strategies are updated.
 func (rl *RateLimiter) Update(creditsPerSecond, maxBalance float64) {
-	rl.lock.Lock()
-	defer rl.lock.Unlock()
-
-	rl.updateBalance() // get up to date balance
-	rl.balance = rl.balance * maxBalance / rl.maxBalance
-	rl.creditsPerSecond = creditsPerSecond
-	rl.maxBalance = maxBalance
+	_ = "STUB: not implemented"
+	return
 }
+
+// get up to date balance

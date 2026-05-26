@@ -6,11 +6,8 @@ package handler // import "go.opentelemetry.io/contrib/examples/passthrough/hand
 
 import (
 	"context"
-	"log"
 	"net/http"
-	"time"
 
-	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -27,41 +24,20 @@ type Handler struct {
 // New returns a new Handler that will trace requests before handing them off
 // to next.
 func New(next func(r *http.Request)) *Handler {
+	_ = "STUB: not implemented"
 	// Like most instrumentation packages, this handler defaults to using the
 	// global propagators and tracer providers.
-	return &Handler{
-		propagators: otel.GetTextMapPropagator(),
-		tracer:      otel.Tracer("go.opentelemetry.io/contrib/examples/passthrough/handler"),
-		next:        next,
-	}
+	return nil
 }
 
 // HandleHTTPReq mimics what an instrumented http server does.
-func (h *Handler) HandleHTTPReq(r *http.Request) {
-	ctx := h.propagators.Extract(r.Context(), propagation.HeaderCarrier(r.Header))
-	var span trace.Span
-	log.Println("The \"handle passthrough request\" span should NOT be recorded, because it is recorded by a TracerProvider not backed by the SDK.")
-	ctx, span = h.tracer.Start(ctx, "handle passthrough request")
-	defer span.End()
+func (h *Handler) HandleHTTPReq(r *http.Request) { _ = "STUB: not implemented"; return }
 
-	// Pretend to do work
-	time.Sleep(time.Second)
-
-	h.makeOutgoingRequest(ctx)
-}
+// Pretend to do work
 
 // makeOutgoingRequest mimics what an instrumented http client does.
 func (h *Handler) makeOutgoingRequest(ctx context.Context) {
+	_ = "STUB: not implemented"
 	// make a new http request
-	r, err := http.NewRequestWithContext(ctx, "", "", http.NoBody)
-	if err != nil {
-		panic(err)
-	}
-
-	log.Println("The \"make outgoing request from passthrough\" span should NOT be recorded, because it is recorded by a TracerProvider not backed by the SDK.")
-	ctx, span := h.tracer.Start(ctx, "make outgoing request from passthrough")
-	defer span.End()
-	r = r.WithContext(ctx)
-	h.propagators.Inject(ctx, propagation.HeaderCarrier(r.Header))
-	h.next(r)
+	return
 }

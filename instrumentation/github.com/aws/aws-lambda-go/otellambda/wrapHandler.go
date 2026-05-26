@@ -22,18 +22,12 @@ var _ lambda.Handler = wrappedHandler{}
 
 // Invoke adds OTel span surrounding customer Handler invocation.
 func (h wrappedHandler) Invoke(ctx context.Context, payload []byte) ([]byte, error) {
-	ctx, span := h.instrumentor.tracingBegin(ctx, payload)
-	defer h.instrumentor.tracingEnd(ctx, span)
-
-	response, err := h.handler.Invoke(ctx, payload)
-	if err != nil {
-		return nil, err
-	}
-
-	return response, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // WrapHandler Provides a Handler which wraps customer Handler with OTel Tracing.
 func WrapHandler(handler lambda.Handler, options ...Option) lambda.Handler {
-	return wrappedHandler{instrumentor: newInstrumentor(options...), handler: handler}
+	_ = "STUB: not implemented"
+	return *new(lambda.Handler)
 }

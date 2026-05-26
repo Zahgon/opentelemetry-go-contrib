@@ -37,11 +37,9 @@ package otelzap // import "go.opentelemetry.io/contrib/bridges/otelzap"
 
 import (
 	"context"
-	"slices"
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/log"
-	"go.opentelemetry.io/otel/log/global"
 	semconv "go.opentelemetry.io/otel/semconv/v1.41.0"
 	"go.uber.org/zap/zapcore"
 )
@@ -58,18 +56,7 @@ type config struct {
 	attributes []attribute.KeyValue
 }
 
-func newConfig(options []Option) config {
-	var c config
-	for _, opt := range options {
-		c = opt.apply(c)
-	}
-
-	if c.provider == nil {
-		c.provider = global.GetLoggerProvider()
-	}
-
-	return c
-}
+func newConfig(options []Option) config { _ = "STUB: not implemented"; return *new(config) }
 
 // Option configures a [Core].
 type Option interface {
@@ -78,35 +65,27 @@ type Option interface {
 
 type optFunc func(config) config
 
-func (f optFunc) apply(c config) config { return f(c) }
+func (f optFunc) apply(c config) config {
+	_ = "STUB: not implemented"
 
-// WithVersion returns an [Option] that configures the version of the
-// [log.Logger] used by a [Core]. The version should be the version of the
-// package that is being logged.
-func WithVersion(version string) Option {
-	return optFunc(func(c config) config {
-		c.version = version
-		return c
-	})
+	// WithVersion returns an [Option] that configures the version of the
+	// [log.Logger] used by a [Core]. The version should be the version of the
+	// package that is being logged.
+	return *new(config)
 }
+
+func WithVersion(version string) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithSchemaURL returns an [Option] that configures the semantic convention
 // schema URL of the [log.Logger] used by a [Core]. The schemaURL should be
 // the schema URL for the semantic conventions used in log records.
-func WithSchemaURL(schemaURL string) Option {
-	return optFunc(func(c config) config {
-		c.schemaURL = schemaURL
-		return c
-	})
-}
+func WithSchemaURL(schemaURL string) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithAttributes returns an [Option] that configures the instrumentation scope
 // attributes of the [log.Logger] used by a [Core].
 func WithAttributes(attributes ...attribute.KeyValue) Option {
-	return optFunc(func(c config) config {
-		c.attributes = attributes
-		return c
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithLoggerProvider returns an [Option] that configures [log.LoggerProvider]
@@ -115,10 +94,8 @@ func WithAttributes(attributes ...attribute.KeyValue) Option {
 // By default if this Option is not provided, the Handler will use the global
 // LoggerProvider.
 func WithLoggerProvider(provider log.LoggerProvider) Option {
-	return optFunc(func(c config) config {
-		c.provider = provider
-		return c
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // Core is a [zapcore.Core] that sends logging records to OpenTelemetry.
@@ -137,183 +114,47 @@ var _ zapcore.Core = (*Core)(nil)
 // NewCore creates a new [zapcore.Core] that can be used with [go.uber.org/zap.New].
 // The name should be the package import path that is being logged.
 // The name is ignored for named loggers created using [go.uber.org/zap.Logger.Named].
-func NewCore(name string, opts ...Option) *Core {
-	cfg := newConfig(opts)
-
-	var loggerOpts []log.LoggerOption
-	if cfg.version != "" {
-		loggerOpts = append(loggerOpts, log.WithInstrumentationVersion(cfg.version))
-	}
-	if cfg.schemaURL != "" {
-		loggerOpts = append(loggerOpts, log.WithSchemaURL(cfg.schemaURL))
-	}
-	if cfg.attributes != nil {
-		loggerOpts = append(loggerOpts, log.WithInstrumentationAttributes(cfg.attributes...))
-	}
-
-	logger := cfg.provider.Logger(name, loggerOpts...)
-
-	return &Core{
-		provider: cfg.provider,
-		logger:   logger,
-		opts:     loggerOpts,
-		ctx:      context.Background(),
-	}
-}
+func NewCore(name string, opts ...Option) *Core { _ = "STUB: not implemented"; return nil }
 
 // Enabled decides whether a given logging level is enabled when logging a message.
-func (o *Core) Enabled(level zapcore.Level) bool {
-	param := log.EnabledParameters{Severity: convertLevel(level)}
-	return o.logger.Enabled(context.Background(), param)
-}
+func (o *Core) Enabled(level zapcore.Level) bool { _ = "STUB: not implemented"; return false }
 
 // With adds structured context to the Core.
 func (o *Core) With(fields []zapcore.Field) zapcore.Core {
-	cloned := o.clone()
-	if len(fields) > 0 {
-		ctx, attrbuf, err := convertField(fields)
-		if ctx != nil {
-			cloned.ctx = ctx
-		}
-		cloned.attr = append(cloned.attr, attrbuf...)
-		if err != nil {
-			cloned.err = err
-		}
-	}
-	return cloned
+	_ = "STUB: not implemented"
+	return *new(zapcore.Core)
 }
 
-func (o *Core) clone() *Core {
-	return &Core{
-		provider: o.provider,
-		opts:     o.opts,
-		logger:   o.logger,
-		attr:     slices.Clone(o.attr),
-		ctx:      o.ctx,
-		err:      o.err,
-	}
-}
+func (o *Core) clone() *Core { _ = "STUB: not implemented"; return nil }
 
 // Sync flushes buffered logs (if any).
 func (*Core) Sync() error {
+	_ = "STUB: not implemented"
+
+	// Check determines whether the supplied Entry should be logged.
+	// If the entry should be logged, the Core adds itself to the CheckedEntry and returns the result.
 	return nil
 }
 
-// Check determines whether the supplied Entry should be logged.
-// If the entry should be logged, the Core adds itself to the CheckedEntry and returns the result.
 func (o *Core) Check(ent zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.CheckedEntry {
-	param := log.EnabledParameters{Severity: convertLevel(ent.Level)}
-
-	logger := o.logger
-	if ent.LoggerName != "" {
-		logger = o.provider.Logger(ent.LoggerName, o.opts...)
-	}
-
-	if logger.Enabled(context.Background(), param) {
-		return ce.AddCore(ent, o)
-	}
-	return ce
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Write method encodes zap fields to OTel logs and emits them.
 func (o *Core) Write(ent zapcore.Entry, fields []zapcore.Field) error {
-	r := log.Record{}
-	r.SetTimestamp(ent.Time)
-	r.SetBody(log.StringValue(ent.Message))
-	r.SetSeverity(convertLevel(ent.Level))
-	r.SetSeverityText(ent.Level.String())
-
-	emitCtx := o.ctx
-	recErr := o.err
-	var attrbuf []log.KeyValue
-	if len(fields) > 0 {
-		ctx, converted, err := convertField(fields)
-		if ctx != nil {
-			emitCtx = ctx
-		}
-		attrbuf = converted
-		if err != nil {
-			recErr = err
-		}
-	}
-
-	r.AddAttributes(o.attr...)
-	if ent.Caller.Defined {
-		r.AddAttributes(
-			log.String(string(semconv.CodeFilePathKey), ent.Caller.File),
-			log.Int(string(semconv.CodeLineNumberKey), ent.Caller.Line),
-			log.String(string(semconv.CodeFunctionNameKey), ent.Caller.Function),
-		)
-	}
-	if ent.Stack != "" {
-		stacktraceKey := semconv.CodeStacktraceKey
-		if recErr != nil || hasExceptionAttributes(o.attr) || hasExceptionAttributes(attrbuf) {
-			stacktraceKey = semconv.ExceptionStacktraceKey
-		}
-		r.AddAttributes(log.String(string(stacktraceKey), ent.Stack))
-	}
-	r.AddAttributes(attrbuf...)
-	if recErr != nil {
-		r.SetErr(recErr)
-	}
-
-	logger := o.logger
-	if ent.LoggerName != "" {
-		logger = o.provider.Logger(ent.LoggerName, o.opts...)
-	}
-	logger.Emit(emitCtx, r)
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func convertField(fields []zapcore.Field) (context.Context, []log.KeyValue, error) {
-	var ctx context.Context
-	enc := newObjectEncoder(len(fields))
-	var errField error
-	for _, field := range fields {
-		if ctxFld, ok := field.Interface.(context.Context); ok {
-			ctx = ctxFld
-			continue
-		}
-		if field.Type == zapcore.ErrorType && field.Key == "error" {
-			errField = field.Interface.(error)
-			continue
-		}
-		field.AddTo(enc)
-	}
-
-	enc.calculate(enc.root)
-	return ctx, enc.root.attrs, errField
+	_ = "STUB: not implemented"
+	return *new(context.Context), nil, nil
 }
 
-func hasExceptionAttributes(attrs []log.KeyValue) bool {
-	if len(attrs) == 0 {
-		return false
-	}
-	for _, attr := range attrs {
-		if attr.Key == exceptionMessageKey || attr.Key == exceptionTypeKey {
-			return true
-		}
-	}
-	return false
-}
+func hasExceptionAttributes(attrs []log.KeyValue) bool { _ = "STUB: not implemented"; return false }
 
 func convertLevel(level zapcore.Level) log.Severity {
-	switch level {
-	case zapcore.DebugLevel:
-		return log.SeverityDebug
-	case zapcore.InfoLevel:
-		return log.SeverityInfo
-	case zapcore.WarnLevel:
-		return log.SeverityWarn
-	case zapcore.ErrorLevel:
-		return log.SeverityError
-	case zapcore.DPanicLevel:
-		return log.SeverityFatal1
-	case zapcore.PanicLevel:
-		return log.SeverityFatal2
-	case zapcore.FatalLevel:
-		return log.SeverityFatal3
-	default:
-		return log.SeverityUndefined
-	}
+	_ = "STUB: not implemented"
+	return *new(log.Severity)
 }

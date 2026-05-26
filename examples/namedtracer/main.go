@@ -6,14 +6,11 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/go-logr/stdr"
-	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/baggage"
-	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
 
@@ -29,19 +26,7 @@ var (
 var tp *sdktrace.TracerProvider
 
 // initTracer creates and registers trace provider instance.
-func initTracer() error {
-	exp, err := stdouttrace.New(stdouttrace.WithPrettyPrint())
-	if err != nil {
-		return fmt.Errorf("failed to initialize stdouttrace exporter: %w", err)
-	}
-	bsp := sdktrace.NewBatchSpanProcessor(exp)
-	tp = sdktrace.NewTracerProvider(
-		sdktrace.WithSampler(sdktrace.AlwaysSample()),
-		sdktrace.WithSpanProcessor(bsp),
-	)
-	otel.SetTracerProvider(tp)
-	return nil
-}
+func initTracer() error { _ = "STUB: not implemented"; return nil }
 
 func main() {
 	// Set logging level to info to see SDK status messages

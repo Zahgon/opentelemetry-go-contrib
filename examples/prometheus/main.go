@@ -5,15 +5,12 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"math/rand"
-	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/prometheus"
 	api "go.opentelemetry.io/otel/metric"
@@ -82,12 +79,6 @@ func main() {
 	<-ctx.Done()
 }
 
-func serveMetrics() {
-	log.Printf("serving metrics at localhost:2223/metrics")
-	http.Handle("/metrics", promhttp.Handler())
-	err := http.ListenAndServe(":2223", nil) //nolint:gosec // Ignoring G114: Use of net/http serve function that has no support for setting timeouts.
-	if err != nil {
-		fmt.Printf("error serving http: %v", err)
-		return
-	}
-}
+func serveMetrics() { _ = "STUB: not implemented"; return }
+
+//nolint:gosec // Ignoring G114: Use of net/http serve function that has no support for setting timeouts.

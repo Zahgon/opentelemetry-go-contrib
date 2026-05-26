@@ -10,7 +10,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -33,7 +32,8 @@ type MetricOption = option[metric.Reader]
 // WithFallbackMetricReader sets the fallback exporter to use when no exporter
 // is configured through the OTEL_METRICS_EXPORTER environment variable.
 func WithFallbackMetricReader(metricReaderFactory func(ctx context.Context) (metric.Reader, error)) MetricOption {
-	return withFallbackFactory[metric.Reader](metricReaderFactory)
+	_ = "STUB: not implemented"
+	return *new(MetricOption)
 }
 
 // NewMetricReader returns a configured [go.opentelemetry.io/otel/sdk/metric.Reader]
@@ -72,27 +72,31 @@ func WithFallbackMetricReader(metricReaderFactory func(ctx context.Context) (met
 //
 // Use [IsNoneMetricReader] to check if the returned exporter is a "no operation" exporter.
 func NewMetricReader(ctx context.Context, opts ...MetricOption) (metric.Reader, error) {
-	return metricsSignal.create(ctx, opts...)
+	_ = "STUB: not implemented"
+	return *new(metric.Reader), nil
 }
 
 // RegisterMetricReader sets the MetricReader factory to be used when the
 // OTEL_METRICS_EXPORTERS environment variable contains the exporter name. This
 // will panic if name has already been registered.
 func RegisterMetricReader(name string, factory func(context.Context) (metric.Reader, error)) {
-	must(metricsSignal.registry.store(name, factory))
+	_ = "STUB: not implemented"
+	return
 }
 
 // RegisterMetricProducer sets the MetricReader factory to be used when the
 // OTEL_METRICS_PRODUCERS environment variable contains the producer name. This
 // will panic if name has already been registered.
 func RegisterMetricProducer(name string, factory func(context.Context) (metric.Producer, error)) {
-	must(metricsProducers.registry.store(name, factory))
+	_ = "STUB: not implemented"
+	return
 }
 
 // WithFallbackMetricProducer sets the fallback producer to use when no producer
 // is configured through the OTEL_METRICS_PRODUCERS environment variable.
 func WithFallbackMetricProducer(producerFactory func(ctx context.Context) (metric.Producer, error)) {
-	metricsProducers.fallbackProducer = producerFactory
+	_ = "STUB: not implemented"
+	return
 }
 
 var (
@@ -235,19 +239,11 @@ type readerWithServer struct {
 }
 
 func (rws readerWithServer) Shutdown(ctx context.Context) error {
-	return errors.Join(
-		rws.Reader.Shutdown(ctx),
-		rws.server.Shutdown(ctx),
-	)
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func getenv(key, fallback string) string {
-	result, ok := os.LookupEnv(key)
-	if !ok {
-		return fallback
-	}
-	return result
-}
+func getenv(key, fallback string) string { _ = "STUB: not implemented"; return "" }
 
 type producerRegistry struct {
 	envKey           string
@@ -256,53 +252,13 @@ type producerRegistry struct {
 }
 
 func newProducerRegistry(envKey string) producerRegistry {
-	return producerRegistry{
-		envKey: envKey,
-		registry: &registry[metric.Producer]{
-			names: make(map[string]func(context.Context) (metric.Producer, error)),
-		},
-	}
+	_ = "STUB: not implemented"
+	return *new(producerRegistry)
 }
 
 func (pr producerRegistry) create(ctx context.Context) ([]metric.Producer, error) {
-	expType := os.Getenv(pr.envKey)
-	if expType == "" {
-		if pr.fallbackProducer != nil {
-			producer, err := pr.fallbackProducer(ctx)
-			if err != nil {
-				return nil, err
-			}
-
-			return []metric.Producer{producer}, nil
-		}
-
-		return nil, nil
-	}
-
-	producers := dedupedMetricProducers(expType)
-	metricProducers := make([]metric.Producer, 0, len(producers))
-	for _, producer := range producers {
-		producer, err := pr.registry.load(ctx, producer)
-		if err != nil {
-			return nil, err
-		}
-
-		metricProducers = append(metricProducers, producer)
-	}
-
-	return metricProducers, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func dedupedMetricProducers(envValue string) []string {
-	producers := make(map[string]struct{})
-	for producer := range strings.SplitSeq(envValue, ",") {
-		producers[producer] = struct{}{}
-	}
-
-	result := make([]string, 0, len(producers))
-	for producer := range producers {
-		result = append(result, producer)
-	}
-
-	return result
-}
+func dedupedMetricProducers(envValue string) []string { _ = "STUB: not implemented"; return nil }

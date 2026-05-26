@@ -26,37 +26,29 @@ type Option interface {
 type optionFunc func(*config)
 
 func (o optionFunc) apply(c *config) {
-	o(c)
+	_ = "STUB: not implemented"
+
+	// WithPublicEndpoint configures the Handler to link the span with an incoming
+	// span context. If this option is not provided, then the association is a child
+	// association instead of a link.
+	return
 }
 
-// WithPublicEndpoint configures the Handler to link the span with an incoming
-// span context. If this option is not provided, then the association is a child
-// association instead of a link.
-func WithPublicEndpoint() Option {
-	return optionFunc(func(c *config) {
-		c.PublicEndpoint = true
-	})
-}
+func WithPublicEndpoint() Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithPropagators specifies propagators to use for extracting
 // information from the HTTP requests. If none are specified, global
 // ones will be used.
 func WithPropagators(propagators propagation.TextMapPropagator) Option {
-	return optionFunc(func(cfg *config) {
-		if propagators != nil {
-			cfg.Propagators = propagators
-		}
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithTracerProvider specifies a tracer provider to use for creating a tracer.
 // If none is specified, the global provider is used.
 func WithTracerProvider(provider oteltrace.TracerProvider) Option {
-	return optionFunc(func(cfg *config) {
-		if provider != nil {
-			cfg.TracerProvider = provider
-		}
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithPublicEndpointFn runs with every request, and allows conditionally
@@ -65,7 +57,6 @@ func WithTracerProvider(provider oteltrace.TracerProvider) Option {
 // child association instead of a link.
 // Note: [WithPublicEndpoint] takes precedence over WithPublicEndpointFn.
 func WithPublicEndpointFn(fn func(*http.Request) bool) Option {
-	return optionFunc(func(c *config) {
-		c.PublicEndpointFn = fn
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }

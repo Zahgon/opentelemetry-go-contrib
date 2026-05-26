@@ -20,46 +20,11 @@ package testutils // import "go.opentelemetry.io/contrib/samplers/jaegerremote/i
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"io"
 	"net/http"
 )
 
 // getJSON makes an HTTP call to the specified URL and parses the returned JSON into `out`.
-func getJSON(ctx context.Context, url string, out any) error {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, http.NoBody)
-	if err != nil {
-		return err
-	}
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return err
-	}
-	return readJSON(resp, out)
-}
+func getJSON(ctx context.Context, url string, out any) error { _ = "STUB: not implemented"; return nil }
 
 // readJSON reads JSON from http.Response and parses it into `out`.
-func readJSON(resp *http.Response, out any) error {
-	defer resp.Body.Close()
-
-	if resp.StatusCode >= 400 {
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-
-		return fmt.Errorf("status code: %d, body: %s", resp.StatusCode, body)
-	}
-
-	if out == nil {
-		_, err := io.Copy(io.Discard, resp.Body)
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-
-	decoder := json.NewDecoder(resp.Body)
-	return decoder.Decode(out)
-}
+func readJSON(resp *http.Response, out any) error { _ = "STUB: not implemented"; return nil }

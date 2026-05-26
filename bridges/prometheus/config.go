@@ -13,18 +13,7 @@ type config struct {
 }
 
 // newConfig creates a validated config configured with options.
-func newConfig(opts ...Option) config {
-	cfg := config{}
-	for _, opt := range opts {
-		cfg = opt.apply(cfg)
-	}
-
-	if len(cfg.gatherers) == 0 {
-		cfg.gatherers = []prometheus.Gatherer{prometheus.DefaultGatherer}
-	}
-
-	return cfg
-}
+func newConfig(opts ...Option) config { _ = "STUB: not implemented"; return *new(config) }
 
 // Option sets producer option values.
 type Option interface {
@@ -34,14 +23,14 @@ type Option interface {
 type optionFunc func(config) config
 
 func (fn optionFunc) apply(cfg config) config {
-	return fn(cfg)
+	_ = "STUB: not implemented"
+
+	// WithGatherer configures which prometheus Gatherer the Bridge will gather
+	// from. If no registerer is used the prometheus DefaultGatherer is used.
+	return *new(config)
 }
 
-// WithGatherer configures which prometheus Gatherer the Bridge will gather
-// from. If no registerer is used the prometheus DefaultGatherer is used.
 func WithGatherer(gatherer prometheus.Gatherer) Option {
-	return optionFunc(func(cfg config) config {
-		cfg.gatherers = append(cfg.gatherers, gatherer)
-		return cfg
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }

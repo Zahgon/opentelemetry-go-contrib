@@ -5,10 +5,7 @@ package otelgrpc // import "go.opentelemetry.io/contrib/instrumentation/google.g
 
 import (
 	"context"
-	"os"
-	"strings"
 
-	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/propagation"
@@ -69,50 +66,20 @@ type Option interface {
 type optionFunc func(*config)
 
 func (f optionFunc) apply(c *config) {
-	f(c)
+	_ = "STUB: not implemented"
+
+	// newConfig returns a config configured with all the passed Options.
+	return
 }
 
-// newConfig returns a config configured with all the passed Options.
-func newConfig(opts []Option) *config {
-	c := &config{
-		Propagators:    otel.GetTextMapPropagator(),
-		TracerProvider: otel.GetTracerProvider(),
-		MeterProvider:  otel.GetMeterProvider(),
-		semconvMode:    parseSemconvMode(),
-	}
-	for _, o := range opts {
-		o.apply(c)
-	}
+func newConfig(opts []Option) *config { _ = "STUB: not implemented"; return nil }
 
-	return c
-}
-
-func parseSemconvMode() semconvMode {
-	val := os.Getenv("OTEL_SEMCONV_STABILITY_OPT_IN")
-	if val == "" {
-		return semconvModeNew
-	}
-	parts := strings.SplitSeq(val, ",")
-	for p := range parts {
-		p = strings.TrimSpace(p)
-		if p == "rpc/dup" {
-			return semconvModeDup
-		}
-		if p == "rpc/old" {
-			return semconvModeOld
-		}
-	}
-	return semconvModeNew
-}
+func parseSemconvMode() semconvMode { _ = "STUB: not implemented"; return *new(semconvMode) }
 
 // WithPublicEndpoint configures the Handler to link the span with an incoming
 // span context. If this option is not provided, then the association is a child
 // association instead of a link.
-func WithPublicEndpoint() Option {
-	return optionFunc(func(c *config) {
-		c.PublicEndpoint = true
-	})
-}
+func WithPublicEndpoint() Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithPublicEndpointFn runs with every request, and allows conditionally
 // configuring the Handler to link the span with an incoming span context. If
@@ -120,59 +87,40 @@ func WithPublicEndpoint() Option {
 // child association instead of a link.
 // Note: WithPublicEndpoint takes precedence over WithPublicEndpointFn.
 func WithPublicEndpointFn(fn func(context.Context, *stats.RPCTagInfo) bool) Option {
-	return optionFunc(func(c *config) {
-		c.PublicEndpointFn = fn
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithPropagators returns an Option to use the Propagators when extracting
 // and injecting trace context from requests.
 func WithPropagators(p propagation.TextMapPropagator) Option {
-	return optionFunc(func(c *config) {
-		if p != nil {
-			c.Propagators = p
-		}
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithInterceptorFilter returns an Option to use the request filter.
 //
 // Deprecated: Use stats handlers instead.
 func WithInterceptorFilter(f InterceptorFilter) Option {
-	return optionFunc(func(c *config) {
-		if f != nil {
-			c.InterceptorFilter = f
-		}
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithFilter returns an Option to use the request filter.
-func WithFilter(f Filter) Option {
-	return optionFunc(func(c *config) {
-		if f != nil {
-			c.Filter = f
-		}
-	})
-}
+func WithFilter(f Filter) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithTracerProvider returns an Option to use the TracerProvider when
 // creating a Tracer.
 func WithTracerProvider(tp trace.TracerProvider) Option {
-	return optionFunc(func(c *config) {
-		if tp != nil {
-			c.TracerProvider = tp
-		}
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithMeterProvider returns an Option to use the MeterProvider when
 // creating a Meter. If this option is not provide the global MeterProvider will be used.
 func WithMeterProvider(mp metric.MeterProvider) Option {
-	return optionFunc(func(c *config) {
-		if mp != nil {
-			c.MeterProvider = mp
-		}
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // Event type that can be recorded, see WithMessageEvents.
@@ -191,27 +139,15 @@ const (
 // Valid events are:
 //   - ReceivedEvents: Record the number of bytes read after every gRPC read operation.
 //   - SentEvents: Record the number of bytes written after every gRPC write operation.
-func WithMessageEvents(events ...Event) Option {
-	return optionFunc(func(c *config) {
-		for _, e := range events {
-			switch e {
-			case ReceivedEvents:
-				c.ReceivedEvent = true
-			case SentEvents:
-				c.SentEvent = true
-			}
-		}
-	})
-}
+func WithMessageEvents(events ...Event) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithSpanOptions configures an additional set of
 // trace.SpanOptions, which are applied to each new span.
 //
 // Deprecated: It is only used by the deprecated interceptor, and is unused by [NewClientHandler] and [NewServerHandler].
 func WithSpanOptions(opts ...trace.SpanStartOption) Option {
-	return optionFunc(func(c *config) {
-		c.SpanStartOptions = append(c.SpanStartOptions, opts...)
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithSpanKind returns an Option to set the span kind for spans created by
@@ -220,28 +156,18 @@ func WithSpanOptions(opts ...trace.SpanStartOption) Option {
 // By default, [NewServerHandler] creates spans with
 // [trace.SpanKindServer] and [NewClientHandler] creates spans with
 // [trace.SpanKindClient].
-func WithSpanKind(sk trace.SpanKind) Option {
-	return optionFunc(func(c *config) {
-		c.SpanKind = sk
-	})
-}
+func WithSpanKind(sk trace.SpanKind) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithSpanAttributes returns an Option to add custom attributes to the spans.
 func WithSpanAttributes(a ...attribute.KeyValue) Option {
-	return optionFunc(func(c *config) {
-		if a != nil {
-			c.SpanAttributes = a
-		}
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithMetricAttributes returns an Option to add custom attributes to the metrics.
 func WithMetricAttributes(a ...attribute.KeyValue) Option {
-	return optionFunc(func(c *config) {
-		if a != nil {
-			c.MetricAttributes = append(c.MetricAttributes, a...)
-		}
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithMetricAttributesFn returns an Option to add dynamic custom attributes to the handler's metrics.
@@ -249,9 +175,6 @@ func WithMetricAttributes(a ...attribute.KeyValue) Option {
 //
 // The context parameter is the standard gRPC request context and provides access to request-scoped data.
 func WithMetricAttributesFn(fn func(ctx context.Context) []attribute.KeyValue) Option {
-	return optionFunc(func(c *config) {
-		if fn != nil {
-			c.MetricAttributesFn = fn
-		}
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }

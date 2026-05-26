@@ -6,9 +6,6 @@ package jaeger // import "go.opentelemetry.io/contrib/propagators/jaeger"
 import (
 	"context"
 	"errors"
-	"fmt"
-	"strconv"
-	"strings"
 
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
@@ -52,106 +49,37 @@ var _ propagation.TextMapPropagator = &Jaeger{}
 // Inject injects a context to the carrier following jaeger format.
 // The parent span ID is set to an dummy parent span id as the most implementations do.
 func (Jaeger) Inject(ctx context.Context, carrier propagation.TextMapCarrier) {
-	sc := trace.SpanFromContext(ctx).SpanContext()
-	headers := []string{}
-	if !sc.TraceID().IsValid() || !sc.SpanID().IsValid() {
-		return
-	}
-	headers = append(headers, sc.TraceID().String(), sc.SpanID().String(), deprecatedParentSpanID)
-	switch {
-	case debugFromContext(ctx):
-		headers = append(headers, fmt.Sprintf("%x", flagsDebug|flagsSampled))
-	case sc.IsSampled():
-		headers = append(headers, fmt.Sprintf("%x", flagsSampled))
-	default:
-		headers = append(headers, fmt.Sprintf("%x", flagsNotSampled))
-	}
-
-	carrier.Set(jaegerHeader, strings.Join(headers, separator))
+	_ = "STUB: not implemented"
+	return
 }
 
 // Extract extracts a context from the carrier if it contains Jaeger headers.
 func (Jaeger) Extract(ctx context.Context, carrier propagation.TextMapCarrier) context.Context {
+	_ = "STUB: not implemented"
 	// extract tracing information
-	if h := carrier.Get(jaegerHeader); h != "" {
-		ctx, sc, err := extract(ctx, h)
-		if err == nil && sc.IsValid() {
-			return trace.ContextWithRemoteSpanContext(ctx, sc)
-		}
-	}
-
-	return ctx
+	return *new(context.Context)
 }
 
 func extract(ctx context.Context, headerVal string) (context.Context, trace.SpanContext, error) {
-	var (
-		scc = trace.SpanContextConfig{}
-		err error
-	)
-
-	parts := strings.Split(headerVal, separator)
-	if len(parts) != 4 {
-		return ctx, empty, errMalformedTraceContextVal
-	}
-
-	// extract trace ID
-	if parts[0] != "" {
-		id := parts[0]
-		if len(id) > traceID128bitsWidth {
-			return ctx, empty, errInvalidTraceIDLength
-		}
-		// padding when length is less than 32
-		if len(id) < traceID128bitsWidth {
-			padCharCount := traceID128bitsWidth - len(id)
-			id = strings.Repeat(idPaddingChar, padCharCount) + id
-		}
-		scc.TraceID, err = trace.TraceIDFromHex(id)
-		if err != nil {
-			return ctx, empty, errMalformedTraceID
-		}
-	}
-
-	// extract span ID
-	if parts[1] != "" {
-		id := parts[1]
-		if len(id) > spanIDWidth {
-			return ctx, empty, errInvalidSpanIDLength
-		}
-		// padding when length is less than 16
-		if len(id) < spanIDWidth {
-			padCharCount := spanIDWidth - len(id)
-			id = strings.Repeat(idPaddingChar, padCharCount) + id
-		}
-		scc.SpanID, err = trace.SpanIDFromHex(id)
-		if err != nil {
-			return ctx, empty, errMalformedSpanID
-		}
-	}
-
-	// skip third part as it is deprecated
-
-	// extract flag
-	if parts[3] != "" {
-		flagStr := parts[3]
-		flag, err := strconv.ParseInt(flagStr, 16, 64)
-		if err != nil {
-			return ctx, empty, errMalformedFlag
-		}
-		if flag&flagsSampled == flagsSampled {
-			// if sample bit is set, we check if debug bit is also set
-			if flag&flagsDebug == flagsDebug {
-				scc.TraceFlags |= trace.FlagsSampled
-				ctx = withDebug(ctx, true)
-			} else {
-				scc.TraceFlags |= trace.FlagsSampled
-			}
-		}
-		// ignore other bit, including firehose since we don't have corresponding flag in trace context.
-	}
-	return ctx, trace.NewSpanContext(scc), nil
+	_ = "STUB: not implemented"
+	return *new(context.Context), *new(trace.SpanContext), nil
 }
+
+// extract trace ID
+
+// padding when length is less than 32
+
+// extract span ID
+
+// padding when length is less than 16
+
+// skip third part as it is deprecated
+
+// extract flag
+
+// if sample bit is set, we check if debug bit is also set
+
+// ignore other bit, including firehose since we don't have corresponding flag in trace context.
 
 // Fields returns the Jaeger header key whose value is set with Inject.
-func (Jaeger) Fields() []string {
-	return []string{jaegerHeader}
-}
+func (Jaeger) Fields() []string { _ = "STUB: not implemented"; return nil }

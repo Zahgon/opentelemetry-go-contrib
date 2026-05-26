@@ -7,11 +7,6 @@
 // It should not be used for experiments or new project ideas.
 package x // import "go.opentelemetry.io/contrib/instrumentation/runtime/internal/x"
 
-import (
-	"os"
-	"strconv"
-)
-
 // DeprecatedRuntimeMetrics is an experimental feature flag that defines if the deprecated
 // runtime metrics should be produced. During development of the new
 // conventions, it is enabled by default.
@@ -29,25 +24,17 @@ type BoolFeature struct {
 }
 
 func newFeature(suffix string, defaultVal bool) BoolFeature {
-	const envKeyRoot = "OTEL_GO_X_"
-	return BoolFeature{
-		key:        envKeyRoot + suffix,
-		defaultVal: defaultVal,
-	}
+	_ = "STUB: not implemented"
+	return *new(BoolFeature)
 }
 
 // Key returns the environment variable key that needs to be set to enable the
 // feature.
-func (f BoolFeature) Key() string { return f.key }
+func (f BoolFeature) Key() string {
+	_ = "STUB: not implemented"
 
-// Enabled returns if the feature is enabled.
-func (f BoolFeature) Enabled() bool {
-	v := os.Getenv(f.key)
-
-	val, err := strconv.ParseBool(v)
-	if err != nil {
-		return f.defaultVal
-	}
-
-	return val
+	// Enabled returns if the feature is enabled.
+	return ""
 }
+
+func (f BoolFeature) Enabled() bool { _ = "STUB: not implemented"; return false }

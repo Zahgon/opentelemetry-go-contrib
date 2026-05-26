@@ -17,14 +17,4 @@ var (
 	zoneDownstairsGaugeOpts = []metric.RecordOption{metric.WithAttributes(attribute.String("zone", "downstairs"))}
 )
 
-func otelGaugeUsage(ctx context.Context, meter metric.Meter) {
-	thermostatSetpoint, err := meter.Float64Gauge("thermostat.setpoint",
-		metric.WithDescription("Target temperature set on the thermostat"),
-		metric.WithUnit("Cel"))
-	if err != nil {
-		panic(err)
-	}
-
-	thermostatSetpoint.Record(ctx, 22.5, zoneUpstairsGaugeOpts...)
-	thermostatSetpoint.Record(ctx, 20.0, zoneDownstairsGaugeOpts...)
-}
+func otelGaugeUsage(ctx context.Context, meter metric.Meter) { _ = "STUB: not implemented"; return }

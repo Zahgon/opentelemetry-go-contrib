@@ -24,33 +24,28 @@ type Option interface {
 type optionFunc func(*config)
 
 func (o optionFunc) apply(c *config) {
-	o(c)
+	_ = "STUB: not implemented"
+
+	// WithTracerProvider specifies a tracer provider to use for creating a tracer.
+	// If none is specified, the global TracerProvider is used.
+	return
 }
 
-// WithTracerProvider specifies a tracer provider to use for creating a tracer.
-// If none is specified, the global TracerProvider is used.
 func WithTracerProvider(provider trace.TracerProvider) Option {
-	return optionFunc(func(cfg *config) {
-		if provider != nil {
-			cfg.TracerProvider = provider
-		}
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithTextMapPropagator specifies a Text Map Propagator to use when propagating context.
 // If none is specified, the global TextMapPropagator is used.
 func WithTextMapPropagator(propagator propagation.TextMapPropagator) Option {
-	return optionFunc(func(cfg *config) {
-		if propagator != nil {
-			cfg.TextMapPropagator = propagator
-		}
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithAttributeBuilder specifies an attribute setter function for setting service specific attributes.
 // If none is specified, the service will be determined by the DefaultAttributeBuilder function and the corresponding attributes will be included.
 func WithAttributeBuilder(attributeBuilders ...AttributeBuilder) Option {
-	return optionFunc(func(cfg *config) {
-		cfg.AttributeBuilders = append(cfg.AttributeBuilders, attributeBuilders...)
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }

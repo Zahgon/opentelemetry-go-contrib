@@ -4,8 +4,6 @@
 package envcar // import "go.opentelemetry.io/contrib/propagators/envcar"
 
 import (
-	"os"
-	"strings"
 	"sync"
 
 	"go.opentelemetry.io/otel/propagation"
@@ -37,38 +35,19 @@ var _ propagation.TextMapCarrier = (*Carrier)(nil)
 
 // fetch runs once on first access, and stores the environment in the
 // carrier.
-func (c *Carrier) fetch() {
-	c.once.Do(func() {
-		environ := os.Environ()
-		c.values = make(map[string]string, len(environ))
-		for _, kv := range environ {
-			kvPair := strings.SplitN(kv, "=", 2)
-			key := normalize(kvPair[0])
-			c.values[key] = kvPair[1]
-		}
-	})
-}
+func (c *Carrier) fetch() { _ = "STUB: not implemented"; return }
 
 // Get returns the value associated with the normalized passed key.
 // The first call to [Carrier.Get] or [Carrier.Keys] for a
 // given Carrier will read and store the values from the
 // environment and all future reads will be from that store.
-func (c *Carrier) Get(key string) string {
-	c.fetch()
-	return c.values[normalize(key)]
-}
+func (c *Carrier) Get(key string) string { _ = "STUB: not implemented"; return "" }
 
 // Set stores the key-value pair in the environment variable.
 // The key is normalized before being used to set the
 // environment variable.
 // If SetEnvFunc is not set, this method does nothing.
-func (c *Carrier) Set(key, value string) {
-	if c.SetEnvFunc == nil {
-		return
-	}
-	k := normalize(key)
-	c.SetEnvFunc(k, value)
-}
+func (c *Carrier) Set(key, value string) { _ = "STUB: not implemented"; return }
 
 // Keys lists the keys stored in this carrier.
 // This returns all the keys in the environment variables.
@@ -76,11 +55,4 @@ func (c *Carrier) Set(key, value string) {
 // given Carrier will read and store the values from the
 // environment and all future reads will be from that store.
 // The keys are returned in their normalized form.
-func (c *Carrier) Keys() []string {
-	c.fetch()
-	keys := make([]string, 0, len(c.values))
-	for key := range c.values {
-		keys = append(keys, key)
-	}
-	return keys
-}
+func (c *Carrier) Keys() []string { _ = "STUB: not implemented"; return nil }

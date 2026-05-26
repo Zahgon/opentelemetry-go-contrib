@@ -5,9 +5,9 @@ package main
 
 // Stub functions representing device APIs used across the code examples.
 
-func totalEnergyJoules(_ string) float64    { return 0.0 }
-func livingRoomTemperatureCelsius() float64 { return 0.0 }
-func bedroomTemperatureCelsius() float64    { return 0.0 }
-func connectedDeviceCount(_ string) int     { return 0 }
+func totalEnergyJoules(_ string) float64    { _ = "STUB: not implemented"; return 0 }
+func livingRoomTemperatureCelsius() float64 { _ = "STUB: not implemented"; return 0 }
+func bedroomTemperatureCelsius() float64    { _ = "STUB: not implemented"; return 0 }
+func connectedDeviceCount(_ string) int     { _ = "STUB: not implemented"; return 0 }
 
 func main() {}

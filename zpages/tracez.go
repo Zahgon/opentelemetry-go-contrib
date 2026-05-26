@@ -18,13 +18,7 @@
 package zpages // import "go.opentelemetry.io/contrib/zpages"
 
 import (
-	"fmt"
-	"log"
 	"net/http"
-	"sort"
-	"strconv"
-	"strings"
-	"time"
 
 	"go.opentelemetry.io/otel/attribute"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -75,82 +69,33 @@ type tracezHandler struct {
 
 // NewTracezHandler returns an http.Handler that can be used to serve HTTP requests for trace zpages.
 func NewTracezHandler(sp *SpanProcessor) http.Handler {
-	return &tracezHandler{sp: sp}
+	_ = "STUB: not implemented"
+	return *new(http.Handler)
 }
 
 // ServeHTTP implements the http.Handler and is capable of serving "tracez" HTTP requests.
 func (th *tracezHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-
-	r.Body = http.MaxBytesReader(w, r.Body, maxRequestBodySize)
-	if err := r.ParseForm(); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	spanName := r.Form.Get(spanNameQueryField)
-	spanType, _ := strconv.Atoi(r.Form.Get(spanTypeQueryField))
-	spanSubtype, _ := strconv.Atoi(r.Form.Get(spanLatencyBucketQueryField))
-
-	if err := headerTemplate.Execute(w, headerData{Title: "Trace Spans"}); err != nil {
-		log.Printf("zpages: executing template: %v", err)
-	}
-	if err := summaryTableTemplate.Execute(w, th.getSummaryTableData()); err != nil {
-		log.Printf("zpages: executing template: %v", err)
-	}
-	if spanName != "" {
-		if err := tracesTableTemplate.Execute(w, th.getTraceTableData(spanName, spanType, spanSubtype)); err != nil {
-			log.Printf("zpages: executing template: %v", err)
-		}
-	}
-	if err := footerTemplate.Execute(w, nil); err != nil {
-		log.Printf("zpages: executing template: %v", err)
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 func (th *tracezHandler) getTraceTableData(spanName string, spanType, latencyBucket int) traceTableData {
-	var spans []sdktrace.ReadOnlySpan
-	switch spanType {
-	case 0: // active
-		spans = th.sp.activeSpans(spanName)
-	case 1: // latency
-		spans = th.sp.spansByLatency(spanName, latencyBucket)
-	case 2: // error
-		spans = th.sp.errorSpans(spanName)
-	}
-
-	data := traceTableData{
-		Name: spanName,
-		Num:  len(spans),
-	}
-	for _, s := range spans {
-		data.Rows = append(data.Rows, spanRows(s)...)
-	}
-	return data
+	_ = "STUB: not implemented"
+	return *new(traceTableData)
 }
+
+// active
+
+// latency
+
+// error
 
 func (th *tracezHandler) getSummaryTableData() summaryTableData {
-	data := summaryTableData{
-		Links:          true,
-		TracesEndpoint: "tracez",
-	}
-	data.Header = []string{"Name", "active"}
-	// An implicit 0 lower bound latency bucket is always present.
-	latencyBuckets := append([]time.Duration{0}, defaultBoundaries.durations...)
-	for _, l := range latencyBuckets {
-		s := fmt.Sprintf(">%v", l)
-		data.Header = append(data.Header, s)
-		data.LatencyBucketNames = append(data.LatencyBucketNames, s)
-	}
-	data.Header = append(data.Header, "Errors")
-	for name, s := range th.sp.spansPerMethod() {
-		row := summaryTableRowData{Name: name, Active: s.activeSpans, Errors: s.errorSpans, Latency: s.latencySpans}
-		data.Rows = append(data.Rows, row)
-	}
-	sort.Slice(data.Rows, func(i, j int) bool {
-		return data.Rows[i].Name < data.Rows[j].Name
-	})
-	return data
+	_ = "STUB: not implemented"
+	return *new(summaryTableData)
 }
+
+// An implicit 0 lower bound latency bucket is always present.
 
 type spanRow struct {
 	Fields [3]string
@@ -160,108 +105,25 @@ type spanRow struct {
 
 type events []sdktrace.Event
 
-func (e events) Len() int { return len(e) }
-func (e events) Less(i, j int) bool {
-	return e[i].Time.Before(e[j].Time)
-}
-func (e events) Swap(i, j int) { e[i], e[j] = e[j], e[i] }
+func (e events) Len() int           { _ = "STUB: not implemented"; return 0 }
+func (e events) Less(i, j int) bool { _ = "STUB: not implemented"; return false }
+
+func (e events) Swap(i, j int) { _ = "STUB: not implemented"; return }
 
 type attributes []attribute.KeyValue
 
-func (e attributes) Len() int { return len(e) }
-func (e attributes) Less(i, j int) bool {
-	return string(e[i].Key) < string(e[j].Key)
-}
-func (e attributes) Swap(i, j int) { e[i], e[j] = e[j], e[i] }
+func (e attributes) Len() int           { _ = "STUB: not implemented"; return 0 }
+func (e attributes) Less(i, j int) bool { _ = "STUB: not implemented"; return false }
 
-func spanRows(s sdktrace.ReadOnlySpan) []spanRow {
-	start := s.StartTime()
+func (e attributes) Swap(i, j int) { _ = "STUB: not implemented"; return }
 
-	lasty, lastm, lastd := start.Date()
-	wholeTime := func(t time.Time) string {
-		return t.Format("2006/01/02-15:04:05") + fmt.Sprintf(".%06d", t.Nanosecond()/1000)
-	}
-	formatTime := func(t time.Time) string {
-		y, m, d := t.Date()
-		if y == lasty && m == lastm && d == lastd {
-			return t.Format("           15:04:05") + fmt.Sprintf(".%06d", t.Nanosecond()/1000)
-		}
-		lasty, lastm, lastd = y, m, d
-		return wholeTime(t)
-	}
+func spanRows(s sdktrace.ReadOnlySpan) []spanRow { _ = "STUB: not implemented"; return nil }
 
-	lastTime := start
-	formatElapsed := func(t time.Time) string {
-		d := t.Sub(lastTime)
-		lastTime = t
-		u := int64(d / 1000)
-		// There are five cases for duration printing:
-		// -1234567890s
-		// -1234.123456
-		//      .123456
-		// 12345.123456
-		// 12345678901s
-		switch {
-		case u < -9999999999:
-			return fmt.Sprintf("%11ds", u/1e6)
-		case u < 0:
-			sec := u / 1e6
-			u -= sec * 1e6
-			return fmt.Sprintf("%5d.%06d", sec, -u)
-		case u < 1e6:
-			return fmt.Sprintf("     .%6d", u)
-		case u <= 99999999999:
-			sec := u / 1e6
-			u -= sec * 1e6
-			return fmt.Sprintf("%5d.%06d", sec, u)
-		default:
-			return fmt.Sprintf("%11ds", u/1e6)
-		}
-	}
+// There are five cases for duration printing:
+// -1234567890s
+// -1234.123456
+//      .123456
+// 12345.123456
+// 12345678901s
 
-	firstRow := spanRow{Fields: [3]string{wholeTime(start), "", ""}, SpanContext: s.SpanContext(), ParentSpanContext: s.Parent()}
-	if s.EndTime().IsZero() {
-		firstRow.Fields[1] = "            "
-	} else {
-		firstRow.Fields[1] = formatElapsed(s.EndTime())
-		lastTime = start
-	}
-	out := []spanRow{firstRow}
-
-	formatAttributes := func(a attributes) string {
-		sort.Sort(a)
-		var s []string
-		for i := range a {
-			s = append(s, fmt.Sprintf("%s=%v", a[i].Key, a[i].Value.Emit())) //nolint:staticcheck // Use deprecated method for formatting backward compatibility.
-		}
-		return "Attributes:{" + strings.Join(s, ", ") + "}"
-	}
-
-	msg := fmt.Sprintf("Status{Code=%s, description=%q}", s.Status().Code.String(), s.Status().Description)
-	out = append(out, spanRow{Fields: [3]string{"", "", msg}})
-
-	if len(s.Attributes()) != 0 {
-		out = append(out, spanRow{Fields: [3]string{"", "", formatAttributes(s.Attributes())}})
-	}
-
-	es := events(s.Events())
-	sort.Sort(es)
-	for _, e := range es {
-		msg := e.Name
-		if len(e.Attributes) != 0 {
-			msg = msg + "  " + formatAttributes(e.Attributes)
-		}
-		row := spanRow{Fields: [3]string{
-			formatTime(e.Time),
-			formatElapsed(e.Time),
-			msg,
-		}}
-		out = append(out, row)
-	}
-	for i := range out {
-		if len(out[i].Fields[2]) > maxTraceMessageLength {
-			out[i].Fields[2] = out[i].Fields[2][:maxTraceMessageLength]
-		}
-	}
-	return out
-}
+//nolint:staticcheck // Use deprecated method for formatting backward compatibility.

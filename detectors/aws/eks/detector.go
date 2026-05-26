@@ -6,18 +6,10 @@ package eks // import "go.opentelemetry.io/contrib/detectors/aws/eks"
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"os"
 	"regexp"
-	"strings"
 
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/resource"
-	semconv "go.opentelemetry.io/otel/semconv/v1.41.0"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 )
 
 const (
@@ -60,134 +52,62 @@ var containerIDRegex = regexp.MustCompile(`^.*/docker/(.+)$`)
 
 // NewResourceDetector returns a resource detector that will detect AWS EKS resources.
 func NewResourceDetector() resource.Detector {
-	utils, err := newK8sDetectorUtils()
-	return &resourceDetector{utils: utils, err: err}
+	_ = "STUB: not implemented"
+	return *new(resource.Detector)
 }
 
 // Detect returns a Resource describing the Amazon EKS environment being run in.
 func (detector *resourceDetector) Detect(ctx context.Context) (*resource.Resource, error) {
-	if detector.err != nil {
-		if errors.Is(detector.err, rest.ErrNotInCluster) {
-			return resource.Empty(), nil
-		}
-
-		return nil, detector.err
-	}
-
-	isEks, err := isEKS(ctx, detector.utils)
-	if err != nil {
-		return nil, err
-	}
-
-	// Return empty resource object if not running in EKS
-	if !isEks {
-		return resource.Empty(), nil
-	}
-
-	// Create variable to hold resource attributes
-	attributes := []attribute.KeyValue{
-		semconv.CloudProviderAWS,
-		semconv.CloudPlatformAWSEKS,
-	}
-
-	// Get clusterName and append to attributes
-	clusterName, err := getClusterName(ctx, detector.utils)
-	if err != nil {
-		return nil, err
-	}
-	if clusterName != "" {
-		attributes = append(attributes, semconv.K8SClusterName(clusterName))
-	}
-
-	// Get containerID and append to attributes
-	containerID, err := detector.utils.getContainerID()
-	if err != nil {
-		return nil, err
-	}
-	if containerID != "" {
-		attributes = append(attributes, semconv.ContainerID(containerID))
-	}
-
-	// Return new resource object with clusterName and containerID as attributes
-	return resource.NewWithAttributes(semconv.SchemaURL, attributes...), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Return empty resource object if not running in EKS
+
+// Create variable to hold resource attributes
+
+// Get clusterName and append to attributes
+
+// Get containerID and append to attributes
+
+// Return new resource object with clusterName and containerID as attributes
 
 // isEKS checks if the current environment is running in EKS.
 func isEKS(ctx context.Context, utils detectorUtils) (bool, error) {
-	if !isK8s(utils) {
-		return false, nil
-	}
-
-	// Make HTTP GET request
-	awsAuth, err := utils.getConfigMap(ctx, authConfigmapNS, authConfigmapName)
-	if err != nil {
-		return false, fmt.Errorf("isEks() error retrieving auth configmap: %w", err)
-	}
-
-	return awsAuth != nil, nil
+	_ = "STUB: not implemented"
+	return false, nil
 }
+
+// Make HTTP GET request
 
 // newK8sDetectorUtils creates the Kubernetes clientset.
 func newK8sDetectorUtils() (*eksDetectorUtils, error) {
+	_ = "STUB: not implemented"
 	// Get cluster configuration
-	confs, err := rest.InClusterConfig()
-	if err != nil {
-		return nil, fmt.Errorf("failed to create config: %w", err)
-	}
-
-	// Create clientset using generated configuration
-	clientset, err := kubernetes.NewForConfig(confs)
-	if err != nil {
-		return nil, errors.New("failed to create clientset for Kubernetes client")
-	}
-
-	return &eksDetectorUtils{clientset: clientset}, nil
+	return nil, nil
 }
+
+// Create clientset using generated configuration
 
 // isK8s checks if the current environment is running in a Kubernetes environment.
-func isK8s(utils detectorUtils) bool {
-	return utils.fileExists(k8sTokenPath) && utils.fileExists(k8sCertPath)
-}
+func isK8s(utils detectorUtils) bool { _ = "STUB: not implemented"; return false }
 
 // fileExists checks if a file with a given filename exists.
-func (eksDetectorUtils) fileExists(filename string) bool {
-	info, err := os.Stat(filename)
-	return err == nil && !info.IsDir()
-}
+func (eksDetectorUtils) fileExists(filename string) bool { _ = "STUB: not implemented"; return false }
 
 // getConfigMap retrieves the configuration map from the k8s API.
 func (eksUtils eksDetectorUtils) getConfigMap(ctx context.Context, namespace, name string) (map[string]string, error) {
-	cm, err := eksUtils.clientset.CoreV1().ConfigMaps(namespace).Get(ctx, name, metav1.GetOptions{})
-	if err != nil {
-		return nil, fmt.Errorf("failed to retrieve ConfigMap %s/%s: %w", namespace, name, err)
-	}
-
-	return cm.Data, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // getClusterName retrieves the clusterName resource attribute.
 func getClusterName(ctx context.Context, utils detectorUtils) (string, error) {
-	resp, err := utils.getConfigMap(ctx, cwConfigmapNS, cwConfigmapName)
-	if err != nil {
-		return "", fmt.Errorf("getClusterName() error: %w", err)
-	}
-
-	return resp["cluster.name"], nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
 
 // getContainerID returns the containerID if currently running within a container.
-func (eksDetectorUtils) getContainerID() (string, error) {
-	fileData, err := os.ReadFile(defaultCgroupPath)
-	if err != nil {
-		return "", fmt.Errorf("getContainerID() error: cannot read file with path %s: %w", defaultCgroupPath, err)
-	}
+func (eksDetectorUtils) getContainerID() (string, error) { _ = "STUB: not implemented"; return "", nil }
 
-	// Retrieve containerID from file
-	splitData := strings.SplitSeq(strings.TrimSpace(string(fileData)), "\n")
-	for str := range splitData {
-		if containerIDRegex.MatchString(str) {
-			return str[len(str)-containerIDLength:], nil
-		}
-	}
-	return "", fmt.Errorf("getContainerID() error: cannot read containerID from file %s", defaultCgroupPath)
-}
+// Retrieve containerID from file

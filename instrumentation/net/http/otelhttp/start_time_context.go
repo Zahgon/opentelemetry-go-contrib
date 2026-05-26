@@ -17,13 +17,14 @@ const startTimeContextKey startTimeContextKeyType = 0
 // instrumentation. Only one labeller can be injected into the context.
 // Injecting it multiple times will override the previous calls.
 func ContextWithStartTime(parent context.Context, start time.Time) context.Context {
-	return context.WithValue(parent, startTimeContextKey, start)
+	_ = "STUB: not implemented"
+	return *new(context.Context)
 }
 
 // StartTimeFromContext retrieves a time.Time from the provided context if one
 // is available. If no start time was found in the provided context, a new,
 // zero start time is returned and the second return value is false.
 func StartTimeFromContext(ctx context.Context) time.Time {
-	t, _ := ctx.Value(startTimeContextKey).(time.Time)
-	return t
+	_ = "STUB: not implemented"
+	return *new(time.Time)
 }

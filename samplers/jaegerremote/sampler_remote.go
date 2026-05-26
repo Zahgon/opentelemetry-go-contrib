@@ -19,18 +19,10 @@
 package jaegerremote // import "go.opentelemetry.io/contrib/samplers/jaegerremote"
 
 import (
-	"bytes"
-	"context"
-	"fmt"
-	"io"
 	"net/http"
-	"net/url"
 	"sync"
-	"sync/atomic"
 	"time"
 
-	"github.com/gogo/protobuf/jsonpb"
-	jaeger_api_v2 "github.com/jaegertracing/jaeger-idl/proto-gen/api_v2"
 	"go.opentelemetry.io/otel/sdk/trace"
 )
 
@@ -86,105 +78,38 @@ func New(
 	serviceName string,
 	opts ...Option,
 ) *Sampler {
-	options := newConfig(opts...)
-	sampler := &Sampler{
-		config:      options,
-		serviceName: serviceName,
-		doneChan:    make(chan *sync.WaitGroup),
-	}
-	go sampler.pollController()
-	return sampler
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ShouldSample returns a sampling choice based on the passed sampling
 // parameters.
 func (s *Sampler) ShouldSample(p trace.SamplingParameters) trace.SamplingResult {
-	s.RLock()
-	defer s.RUnlock()
-	return s.sampler.ShouldSample(p)
+	_ = "STUB: not implemented"
+	return *new(trace.SamplingResult)
 }
 
 // Close does a clean shutdown of the sampler, stopping any background
 // go-routines it may have started.
-func (s *Sampler) Close() {
-	if swapped := atomic.CompareAndSwapInt64(&s.closed, 0, 1); !swapped {
-		s.logger.Info("repeated attempt to close the sampler is ignored")
-		return
-	}
-
-	var wg sync.WaitGroup
-	wg.Add(1)
-	s.doneChan <- &wg
-	wg.Wait()
-}
+func (s *Sampler) Close() { _ = "STUB: not implemented"; return }
 
 // Description returns a human-readable name for the Sampler.
-func (*Sampler) Description() string {
-	return "JaegerRemoteSampler{}"
-}
+func (*Sampler) Description() string { _ = "STUB: not implemented"; return "" }
 
-func (s *Sampler) pollController() {
-	ticker := time.NewTicker(s.samplingRefreshInterval)
-	defer ticker.Stop()
-	s.pollControllerWithTicker(ticker)
-}
+func (s *Sampler) pollController() { _ = "STUB: not implemented"; return }
 
-func (s *Sampler) pollControllerWithTicker(ticker *time.Ticker) {
-	s.UpdateSampler()
+func (s *Sampler) pollControllerWithTicker(ticker *time.Ticker) { _ = "STUB: not implemented"; return }
 
-	for {
-		select {
-		case <-ticker.C:
-			s.UpdateSampler()
-		case wg := <-s.doneChan:
-			wg.Done()
-			return
-		}
-	}
-}
-
-func (s *Sampler) setSampler(sampler trace.Sampler) {
-	s.Lock()
-	defer s.Unlock()
-	s.sampler = sampler
-}
+func (s *Sampler) setSampler(sampler trace.Sampler) { _ = "STUB: not implemented"; return }
 
 // UpdateSampler forces the sampler to fetch sampling strategy from backend server.
 // This function is called automatically on a timer, but can also be safely called manually, e.g. from tests.
-func (s *Sampler) UpdateSampler() {
-	res, err := s.samplingFetcher.Fetch(s.serviceName)
-	if err != nil {
-		s.logger.Error(err, "failed to fetch sampling strategy")
-		return
-	}
-	strategy, err := s.samplingParser.Parse(res)
-	if err != nil {
-		s.logger.Error(err, "failed to parse sampling strategy response")
-		return
-	}
-
-	s.Lock()
-	defer s.Unlock()
-
-	if err := s.updateSamplerViaUpdaters(strategy); err != nil {
-		s.logger.Error(err, "failed to handle sampling strategy response", "response", res)
-		return
-	}
-}
+func (s *Sampler) UpdateSampler() { _ = "STUB: not implemented"; return }
 
 // NB: this function should only be called while holding a Write lock.
 func (s *Sampler) updateSamplerViaUpdaters(strategy any) error {
-	for _, updater := range s.updaters {
-		sampler, err := updater.Update(s.sampler, strategy)
-		if err != nil {
-			return err
-		}
-		if sampler != nil {
-			s.sampler = sampler
-			return nil
-		}
-	}
-	return fmt.Errorf("unsupported sampling strategy %+v", strategy)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // -----------------------
@@ -196,23 +121,11 @@ type probabilisticSamplerUpdater struct {
 
 // Update implements Update of samplerUpdater.
 func (u *probabilisticSamplerUpdater) Update(sampler trace.Sampler, strategy any) (trace.Sampler, error) {
-	type response interface {
-		GetProbabilisticSampling() *jaeger_api_v2.ProbabilisticSamplingStrategy
-	}
-	var _ response = new(jaeger_api_v2.SamplingStrategyResponse) // sanity signature check
-	if resp, ok := strategy.(response); ok {
-		if probabilistic := resp.GetProbabilisticSampling(); probabilistic != nil {
-			if ps, ok := sampler.(*probabilisticSampler); ok {
-				if err := ps.Update(probabilistic.SamplingRate); err != nil {
-					return nil, err
-				}
-				return sampler, nil
-			}
-			return newProbabilisticSampler(probabilistic.SamplingRate, u.attributesDisabled), nil
-		}
-	}
-	return nil, nil
+	_ = "STUB: not implemented"
+	return *new(trace.Sampler), nil
 }
+
+// sanity signature check
 
 // -----------------------
 
@@ -223,22 +136,11 @@ type rateLimitingSamplerUpdater struct {
 
 // Update implements Update of samplerUpdater.
 func (u *rateLimitingSamplerUpdater) Update(sampler trace.Sampler, strategy any) (trace.Sampler, error) {
-	type response interface {
-		GetRateLimitingSampling() *jaeger_api_v2.RateLimitingSamplingStrategy
-	}
-	var _ response = new(jaeger_api_v2.SamplingStrategyResponse) // sanity signature check
-	if resp, ok := strategy.(response); ok {
-		if rateLimiting := resp.GetRateLimitingSampling(); rateLimiting != nil {
-			rateLimit := float64(rateLimiting.MaxTracesPerSecond)
-			if rl, ok := sampler.(*rateLimitingSampler); ok {
-				rl.Update(rateLimit)
-				return rl, nil
-			}
-			return newRateLimitingSampler(rateLimit, u.attributesDisabled), nil
-		}
-	}
-	return nil, nil
+	_ = "STUB: not implemented"
+	return *new(trace.Sampler), nil
 }
+
+// sanity signature check
 
 // -----------------------
 
@@ -252,25 +154,11 @@ type perOperationSamplerUpdater struct {
 
 // Update implements Update of samplerUpdater.
 func (u *perOperationSamplerUpdater) Update(sampler trace.Sampler, strategy any) (trace.Sampler, error) {
-	type response interface {
-		GetOperationSampling() *jaeger_api_v2.PerOperationSamplingStrategies
-	}
-	var _ response = new(jaeger_api_v2.SamplingStrategyResponse) // sanity signature check
-	if p, ok := strategy.(response); ok {
-		if operations := p.GetOperationSampling(); operations != nil {
-			if as, ok := sampler.(*perOperationSampler); ok {
-				as.update(operations)
-				return as, nil
-			}
-			return newPerOperationSampler(perOperationSamplerParams{
-				MaxOperations:            u.MaxOperations,
-				OperationNameLateBinding: u.OperationNameLateBinding,
-				Strategies:               operations,
-			}, u.attributesDisabled), nil
-		}
-	}
-	return nil, nil
+	_ = "STUB: not implemented"
+	return *new(trace.Sampler), nil
 }
+
+// sanity signature check
 
 // -----------------------
 
@@ -280,38 +168,13 @@ type httpSamplingStrategyFetcher struct {
 }
 
 func newHTTPSamplingStrategyFetcher(serverURL string) *httpSamplingStrategyFetcher {
-	return &httpSamplingStrategyFetcher{
-		serverURL: serverURL,
-		httpClient: http.Client{
-			Timeout: defaultRemoteSamplingTimeout,
-		},
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (f *httpSamplingStrategyFetcher) Fetch(serviceName string) ([]byte, error) {
-	v := url.Values{}
-	v.Set("service", serviceName)
-	uri := f.serverURL + "?" + v.Encode()
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, uri, http.NoBody)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := f.httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.StatusCode >= 400 {
-		return nil, fmt.Errorf("status code: %d, body: %c", resp.StatusCode, body)
-	}
-
-	return body, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // -----------------------
@@ -319,13 +182,11 @@ func (f *httpSamplingStrategyFetcher) Fetch(serviceName string) ([]byte, error) 
 type samplingStrategyParserImpl struct{}
 
 func (*samplingStrategyParserImpl) Parse(response []byte) (any, error) {
-	strategy := new(jaeger_api_v2.SamplingStrategyResponse)
-	// Official Jaeger Remote Sampling protocol contains enums encoded as strings.
-	// Legacy protocol contains enums as numbers.
-	// Gogo's jsonpb module can parse either format.
-	// Cf. https://github.com/open-telemetry/opentelemetry-go-contrib/issues/3184
-	if err := jsonpb.Unmarshal(bytes.NewReader(response), strategy); err != nil {
-		return nil, err
-	}
-	return strategy, nil
+	_ = "STUB: not implemented"
+	return *new(any), nil
 }
+
+// Official Jaeger Remote Sampling protocol contains enums encoded as strings.
+// Legacy protocol contains enums as numbers.
+// Gogo's jsonpb module can parse either format.
+// Cf. https://github.com/open-telemetry/opentelemetry-go-contrib/issues/3184

@@ -7,12 +7,8 @@ package lambda // import "go.opentelemetry.io/contrib/detectors/aws/lambda"
 import (
 	"context"
 	"errors"
-	"os"
-	"strconv"
 
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/resource"
-	semconv "go.opentelemetry.io/otel/semconv/v1.41.0"
 )
 
 // For a complete list of reserved environment variables in Lambda, see:
@@ -39,35 +35,16 @@ var _ resource.Detector = (*resourceDetector)(nil)
 
 // NewResourceDetector returns a resource detector that will detect AWS Lambda resources.
 func NewResourceDetector() resource.Detector {
-	return &resourceDetector{}
+	_ = "STUB: not implemented"
+	return *new(resource.Detector)
 }
 
 // Detect collects resource attributes available when running on lambda.
 func (*resourceDetector) Detect(context.Context) (*resource.Resource, error) {
+	_ = "STUB: not implemented"
 	// Lambda resources come from ENV
-	lambdaName := os.Getenv(lambdaFunctionNameEnvVar)
-	if lambdaName == "" {
-		return empty, errNotOnLambda
-	}
-	awsRegion := os.Getenv(awsRegionEnvVar)
-	functionVersion := os.Getenv(lambdaFunctionVersionEnvVar)
-	// The instance attributes corresponds to the log stream name for AWS lambda,
-	// see the FaaS resource specification for more details.
-	instance := os.Getenv(lambdaLogStreamNameEnvVar)
-
-	attrs := []attribute.KeyValue{
-		semconv.CloudProviderAWS,
-		semconv.CloudRegion(awsRegion),
-		semconv.FaaSInstance(instance),
-		semconv.FaaSName(lambdaName),
-		semconv.FaaSVersion(functionVersion),
-	}
-
-	maxMemoryStr := os.Getenv(lambdaMemoryLimitEnvVar)
-	maxMemory, err := strconv.Atoi(maxMemoryStr)
-	if err == nil {
-		attrs = append(attrs, semconv.FaaSMaxMemory(maxMemory*miB))
-	}
-
-	return resource.NewWithAttributes(semconv.SchemaURL, attrs...), nil
+	return nil, nil
 }
+
+// The instance attributes corresponds to the log stream name for AWS lambda,
+// see the FaaS resource specification for more details.

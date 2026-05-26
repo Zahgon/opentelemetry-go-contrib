@@ -12,8 +12,6 @@ import (
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"go.opentelemetry.io/otel"
-	stdout "go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
 
@@ -22,19 +20,7 @@ import (
 
 var tp *sdktrace.TracerProvider
 
-func initTracer() {
-	var err error
-	exp, err := stdout.New(stdout.WithPrettyPrint())
-	if err != nil {
-		fmt.Printf("failed to initialize stdout exporter %v\n", err)
-		return
-	}
-	bsp := sdktrace.NewBatchSpanProcessor(exp)
-	tp = sdktrace.NewTracerProvider(
-		sdktrace.WithSpanProcessor(bsp),
-	)
-	otel.SetTracerProvider(tp)
-}
+func initTracer() { _ = "STUB: not implemented"; return }
 
 func main() {
 	initTracer()

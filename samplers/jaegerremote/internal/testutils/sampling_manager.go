@@ -20,15 +20,9 @@ package testutils // import "go.opentelemetry.io/contrib/samplers/jaegerremote/i
 
 import (
 	"sync"
-
-	jaeger_api_v2 "github.com/jaegertracing/jaeger-idl/proto-gen/api_v2"
 )
 
-func newSamplingManager() *samplingManager {
-	return &samplingManager{
-		sampling: make(map[string]any),
-	}
-}
+func newSamplingManager() *samplingManager { _ = "STUB: not implemented"; return nil }
 
 type samplingManager struct {
 	sampling map[string]any
@@ -37,22 +31,12 @@ type samplingManager struct {
 
 // GetSamplingStrategy implements handler method of sampling.SamplingManager.
 func (s *samplingManager) GetSamplingStrategy(serviceName string) (any, error) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-	if strategy, ok := s.sampling[serviceName]; ok {
-		return strategy, nil
-	}
-	return &jaeger_api_v2.SamplingStrategyResponse{
-		StrategyType: jaeger_api_v2.SamplingStrategyType_PROBABILISTIC,
-		ProbabilisticSampling: &jaeger_api_v2.ProbabilisticSamplingStrategy{
-			SamplingRate: 0.01,
-		},
-	}, nil
+	_ = "STUB: not implemented"
+	return *new(any), nil
 }
 
 // AddSamplingStrategy registers a sampling strategy for a service.
 func (s *samplingManager) AddSamplingStrategy(service string, strategy any) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-	s.sampling[service] = strategy
+	_ = "STUB: not implemented"
+	return
 }

@@ -11,9 +11,4 @@ var thermostatSetpoint = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 	Help: "Target temperature set on the thermostat",
 }, []string{"zone"})
 
-func prometheusGaugeUsage(reg *prometheus.Registry) {
-	reg.MustRegister(thermostatSetpoint)
-
-	thermostatSetpoint.WithLabelValues("upstairs").Set(22.5)
-	thermostatSetpoint.WithLabelValues("downstairs").Set(20.0)
-}
+func prometheusGaugeUsage(reg *prometheus.Registry) { _ = "STUB: not implemented"; return }

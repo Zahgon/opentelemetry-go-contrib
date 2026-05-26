@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"net/http/httptrace"
 
-	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/propagation"
@@ -46,50 +45,28 @@ type Option interface {
 type optionFunc func(*config)
 
 func (o optionFunc) apply(c *config) {
-	o(c)
+	_ = "STUB: not implemented"
+
+	// newConfig creates a new config struct and applies opts to it.
+	return
 }
 
-// newConfig creates a new config struct and applies opts to it.
-func newConfig(opts ...Option) *config {
-	c := &config{
-		Propagators:   otel.GetTextMapPropagator(),
-		MeterProvider: otel.GetMeterProvider(),
-	}
-	for _, opt := range opts {
-		opt.apply(c)
-	}
+func newConfig(opts ...Option) *config { _ = "STUB: not implemented"; return nil }
 
-	// Tracer is only initialized if manually specified. Otherwise, can be passed with the tracing context.
-	if c.TracerProvider != nil {
-		c.Tracer = newTracer(c.TracerProvider)
-	}
-
-	c.Meter = c.MeterProvider.Meter(
-		ScopeName,
-		metric.WithInstrumentationVersion(Version),
-	)
-
-	return c
-}
+// Tracer is only initialized if manually specified. Otherwise, can be passed with the tracing context.
 
 // WithTracerProvider specifies a tracer provider to use for creating a tracer.
 // If none is specified, the global provider is used.
 func WithTracerProvider(provider trace.TracerProvider) Option {
-	return optionFunc(func(cfg *config) {
-		if provider != nil {
-			cfg.TracerProvider = provider
-		}
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithMeterProvider specifies a meter provider to use for creating a meter.
 // If none is specified, the global provider is used.
 func WithMeterProvider(provider metric.MeterProvider) Option {
-	return optionFunc(func(cfg *config) {
-		if provider != nil {
-			cfg.MeterProvider = provider
-		}
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithPublicEndpointFn runs with every request, and allows conditionally
@@ -97,27 +74,22 @@ func WithMeterProvider(provider metric.MeterProvider) Option {
 // this option is not provided or returns false, then the association is a
 // child association instead of a link.
 func WithPublicEndpointFn(fn func(*http.Request) bool) Option {
-	return optionFunc(func(c *config) {
-		c.PublicEndpointFn = fn
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithPropagators configures specific propagators. If this
 // option isn't specified, then the global TextMapPropagator is used.
 func WithPropagators(ps propagation.TextMapPropagator) Option {
-	return optionFunc(func(c *config) {
-		if ps != nil {
-			c.Propagators = ps
-		}
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithSpanOptions configures an additional set of
 // trace.SpanOptions, which are applied to each new span.
 func WithSpanOptions(opts ...trace.SpanStartOption) Option {
-	return optionFunc(func(c *config) {
-		c.SpanStartOptions = append(c.SpanStartOptions, opts...)
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithFilter adds a filter to the list of filters used by the handler.
@@ -126,11 +98,7 @@ func WithSpanOptions(opts ...trace.SpanStartOption) Option {
 // If no filters are provided then all requests are traced.
 // Filters will be invoked for each processed request, it is advised to make them
 // simple and fast.
-func WithFilter(f Filter) Option {
-	return optionFunc(func(c *config) {
-		c.Filters = append(c.Filters, f)
-	})
-}
+func WithFilter(f Filter) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // Event represents message event types for [WithMessageEvents].
 type Event int
@@ -151,18 +119,7 @@ const (
 //     using the ReadBytesKey
 //   - WriteEvents: Record the number of bytes written after every http.ResponeWriter.Write
 //     using the WriteBytesKey
-func WithMessageEvents(events ...Event) Option {
-	return optionFunc(func(c *config) {
-		for _, e := range events {
-			switch e {
-			case ReadEvents:
-				c.ReadEvent = true
-			case WriteEvents:
-				c.WriteEvent = true
-			}
-		}
-	})
-}
+func WithMessageEvents(events ...Event) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithSpanNameFormatter takes a function that will be called on every
 // request and the returned string will become the Span Name.
@@ -171,26 +128,20 @@ func WithMessageEvents(events ...Event) Option {
 // the span name formatter will run twice. Once when the span is created, and
 // second time after the middleware, so the pattern can be used.
 func WithSpanNameFormatter(f func(operation string, r *http.Request) string) Option {
-	return optionFunc(func(c *config) {
-		c.SpanNameFormatter = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithClientTrace takes a function that returns client trace instance that will be
 // applied to the requests sent through the otelhttp Transport.
 func WithClientTrace(f func(context.Context) *httptrace.ClientTrace) Option {
-	return optionFunc(func(c *config) {
-		c.ClientTrace = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithServerName returns an Option that sets the name of the (virtual) server
 // handling requests.
-func WithServerName(server string) Option {
-	return optionFunc(func(c *config) {
-		c.ServerName = server
-	})
-}
+func WithServerName(server string) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithMetricAttributesFn returns an Option to set a function that maps an HTTP request to a slice of attribute.KeyValue.
 // These attributes will be included in metrics for every request.
@@ -198,7 +149,6 @@ func WithServerName(server string) Option {
 // Deprecated: WithMetricAttributesFn is deprecated and will be removed in a
 // future release. Use [Labeler] instead.
 func WithMetricAttributesFn(metricAttributesFn func(r *http.Request) []attribute.KeyValue) Option {
-	return optionFunc(func(c *config) {
-		c.MetricAttributesFn = metricAttributesFn
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }

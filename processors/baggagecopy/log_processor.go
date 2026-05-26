@@ -6,8 +6,6 @@ package baggagecopy // import "go.opentelemetry.io/contrib/processors/baggagecop
 import (
 	"context"
 
-	"go.opentelemetry.io/otel/baggage"
-	api "go.opentelemetry.io/otel/log"
 	"go.opentelemetry.io/otel/sdk/log"
 )
 
@@ -26,37 +24,29 @@ var _ log.Processor = (*LogProcessor)(nil)
 // The passed filter determines which baggage members are added to the span.
 //
 // If filter is nil, all baggage members will be added.
-func NewLogProcessor(filter Filter) *LogProcessor {
-	return &LogProcessor{
-		filter: filter,
-	}
-}
+func NewLogProcessor(filter Filter) *LogProcessor { _ = "STUB: not implemented"; return nil }
 
 // Enabled reports whether the Processor will process.
 func (LogProcessor) Enabled(context.Context, log.EnabledParameters) bool {
-	return true
+	_ = "STUB: not implemented"
+
+	// OnEmit adds Baggage member to a log record as attributes that are pulled from
+	// the Baggage found in ctx. Baggage members are filtered by the filter passed
+	// to NewLogProcessor.
+	return false
 }
 
-// OnEmit adds Baggage member to a log record as attributes that are pulled from
-// the Baggage found in ctx. Baggage members are filtered by the filter passed
-// to NewLogProcessor.
 func (processor LogProcessor) OnEmit(ctx context.Context, record *log.Record) error {
-	filter := processor.filter
-	if filter == nil {
-		filter = AllowAllMembers
-	}
-
-	for _, member := range baggage.FromContext(ctx).Members() {
-		if filter(member) {
-			record.AddAttributes(api.String(member.Key(), member.Value()))
-		}
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // Shutdown is called when the [log.Processor] is shutting down and is a no-op for this processor.
-func (LogProcessor) Shutdown(context.Context) error { return nil }
+func (LogProcessor) Shutdown(context.Context) error {
+	_ = "STUB: not implemented"
 
-// ForceFlush is called to ensure all logs are flushed to the output and is a no-op for this processor.
-func (LogProcessor) ForceFlush(context.Context) error { return nil }
+	// ForceFlush is called to ensure all logs are flushed to the output and is a no-op for this processor.
+	return nil
+}
+
+func (LogProcessor) ForceFlush(context.Context) error { _ = "STUB: not implemented"; return nil }

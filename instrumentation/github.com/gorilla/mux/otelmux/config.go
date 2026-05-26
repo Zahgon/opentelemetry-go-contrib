@@ -32,21 +32,19 @@ type Option interface {
 type optionFunc func(*config)
 
 func (o optionFunc) apply(c *config) {
-	o(c)
+	_ = "STUB: not implemented"
+
+	// Filter is a predicate used to determine whether a given http.request should
+	// be traced. A Filter must return true if the request should be traced.
+	return
 }
 
-// Filter is a predicate used to determine whether a given http.request should
-// be traced. A Filter must return true if the request should be traced.
 type Filter func(*http.Request) bool
 
 // WithPublicEndpoint configures the Handler to link the span with an incoming
 // span context. If this option is not provided, then the association is a child
 // association instead of a link.
-func WithPublicEndpoint() Option {
-	return optionFunc(func(c *config) {
-		c.PublicEndpoint = true
-	})
-}
+func WithPublicEndpoint() Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithPublicEndpointFn runs with every request, and allows conditionally
 // configuring the Handler to link the span with an incoming span context. If
@@ -54,30 +52,23 @@ func WithPublicEndpoint() Option {
 // child association instead of a link.
 // Note: WithPublicEndpoint takes precedence over WithPublicEndpointFn.
 func WithPublicEndpointFn(fn func(*http.Request) bool) Option {
-	return optionFunc(func(c *config) {
-		c.PublicEndpointFn = fn
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithPropagators specifies propagators to use for extracting
 // information from the HTTP requests. If none are specified, global
 // ones will be used.
 func WithPropagators(propagators propagation.TextMapPropagator) Option {
-	return optionFunc(func(cfg *config) {
-		if propagators != nil {
-			cfg.Propagators = propagators
-		}
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithTracerProvider specifies a tracer provider to use for creating a tracer.
 // If none is specified, the global provider is used.
 func WithTracerProvider(provider oteltrace.TracerProvider) Option {
-	return optionFunc(func(cfg *config) {
-		if provider != nil {
-			cfg.TracerProvider = provider
-		}
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithSpanNameFormatter specifies a function to use for generating a custom span
@@ -85,9 +76,8 @@ func WithTracerProvider(provider oteltrace.TracerProvider) Option {
 // name is provided so you can use it in the span name without needing to
 // duplicate the logic for extracting it from the request.
 func WithSpanNameFormatter(fn func(routeName string, r *http.Request) string) Option {
-	return optionFunc(func(cfg *config) {
-		cfg.spanNameFormatter = fn
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithFilter adds a filter to the list of filters used by the handler.
@@ -96,26 +86,18 @@ func WithSpanNameFormatter(fn func(routeName string, r *http.Request) string) Op
 // If no filters are provided then all requests are traced.
 // Filters will be invoked for each processed request, it is advised to make them
 // simple and fast.
-func WithFilter(f Filter) Option {
-	return optionFunc(func(c *config) {
-		c.Filters = append(c.Filters, f)
-	})
-}
+func WithFilter(f Filter) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithMeterProvider specifies a meter provider to use for creating a metric.
 // If none is specified, the global provider is used.
 func WithMeterProvider(provider metric.MeterProvider) Option {
-	return optionFunc(func(cfg *config) {
-		if provider != nil {
-			cfg.MeterProvider = provider
-		}
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithMetricAttributesFn returns an Option to set a function that maps an HTTP request to a slice of attribute.KeyValue.
 // These attributes will be included in metrics for every request.
 func WithMetricAttributesFn(metricAttributesFn func(r *http.Request) []attribute.KeyValue) Option {
-	return optionFunc(func(c *config) {
-		c.MetricAttributesFn = metricAttributesFn
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }

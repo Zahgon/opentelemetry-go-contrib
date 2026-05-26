@@ -6,13 +6,11 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
 
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/propagation"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
@@ -68,24 +66,15 @@ func main() {
 }
 
 func initPassthroughGlobals() {
+	_ = "STUB: not implemented"
 	// We explicitly DO NOT set the global TracerProvider using otel.SetTracerProvider().
 	// The unset TracerProvider returns a "non-recording" span, but still passes through context.
-	log.Println("Register a global TextMapPropagator, but do not register a global TracerProvider to be in \"passthrough\" mode.")
-	log.Println("The \"passthrough\" mode propagates the TraceContext and Baggage, but does not record spans.")
-	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
+	return
 }
 
 // nonGlobalTracer creates a trace provider instance for testing, but doesn't
 // set it as the global tracer provider.
 func nonGlobalTracer() (*sdktrace.TracerProvider, error) {
-	exp, err := stdouttrace.New(stdouttrace.WithPrettyPrint())
-	if err != nil {
-		return nil, fmt.Errorf("failed to initialize stdouttrace exporter: %w", err)
-	}
-	bsp := sdktrace.NewBatchSpanProcessor(exp)
-	tp := sdktrace.NewTracerProvider(
-		sdktrace.WithSampler(sdktrace.AlwaysSample()),
-		sdktrace.WithSpanProcessor(bsp),
-	)
-	return tp, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }

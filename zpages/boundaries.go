@@ -4,7 +4,6 @@
 package zpages // import "go.opentelemetry.io/contrib/zpages"
 
 import (
-	"slices"
 	"time"
 )
 
@@ -30,21 +29,10 @@ type boundaries struct {
 }
 
 // newBoundaries returns a new boundaries.
-func newBoundaries(durations []time.Duration) *boundaries {
-	slices.Sort(durations)
-	return &boundaries{durations: durations}
-}
+func newBoundaries(durations []time.Duration) *boundaries { _ = "STUB: not implemented"; return nil }
 
 // numBuckets returns the number of buckets needed for these boundaries.
-func (lb boundaries) numBuckets() int {
-	return len(lb.durations) + 1
-}
+func (lb boundaries) numBuckets() int { _ = "STUB: not implemented"; return 0 }
 
 // getBucketIndex returns the appropriate bucket index for a given latency.
-func (lb boundaries) getBucketIndex(latency time.Duration) int {
-	i := 0
-	for i < len(lb.durations) && latency >= lb.durations[i] {
-		i++
-	}
-	return i
-}
+func (lb boundaries) getBucketIndex(latency time.Duration) int { _ = "STUB: not implemented"; return 0 }

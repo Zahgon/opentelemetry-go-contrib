@@ -19,12 +19,7 @@
 package zpages // import "go.opentelemetry.io/contrib/zpages"
 
 import (
-	"fmt"
 	"html/template"
-	"io"
-	"log"
-
-	"go.opentelemetry.io/contrib/zpages/internal"
 )
 
 var (
@@ -43,48 +38,21 @@ type headerData struct {
 	Title string
 }
 
-func parseTemplate(name string) *template.Template {
-	f, err := internal.Templates.Open("templates/" + name + ".html")
-	if err != nil {
-		log.Panicf("%v: %v", name, err) //nolint:revive  // Called during initialization.
-	}
-	defer func() {
-		if err = f.Close(); err != nil {
-			log.Panicf("%v: %v", name, err) //nolint:revive  // Called during initialization.
-		}
-	}()
-	text, err := io.ReadAll(f)
-	if err != nil {
-		log.Panicf("%v: %v", name, err) //nolint:revive  // Called during initialization.
-	}
-	return template.Must(template.New(name).Funcs(templateFunctions).Parse(string(text)))
-}
+func parseTemplate(name string) *template.Template { _ = "STUB: not implemented"; return nil }
+
+//nolint:revive  // Called during initialization.
+
+//nolint:revive  // Called during initialization.
+
+//nolint:revive  // Called during initialization.
 
 func spanRowFormatter(r spanRow) template.HTML {
-	if !r.IsValid() {
-		return ""
-	}
-	col := "black"
-	if r.IsSampled() {
-		col = "blue"
-	}
-
-	tpl := fmt.Sprintf(
-		`trace_id: <b style="color:%s">%s</b> span_id: %s`,
-		col,
-		r.TraceID(),
-		r.SpanID(),
-	)
-	if r.ParentSpanContext.IsValid() {
-		tpl += fmt.Sprintf(` parent_span_id: %s`, r.ParentSpanContext.SpanID())
-	}
-
-	//nolint:gosec // G203: None of the dynamic attributes (TraceID/SpanID) can
-	// contain characters that need escaping so this lint issue is a false
-	// positive.
-	return template.HTML(tpl)
+	_ = "STUB: not implemented"
+	return *new(template.HTML)
 }
 
-func even(x int) bool {
-	return x%2 == 0
-}
+//nolint:gosec // G203: None of the dynamic attributes (TraceID/SpanID) can
+// contain characters that need escaping so this lint issue is a false
+// positive.
+
+func even(x int) bool { _ = "STUB: not implemented"; return false }

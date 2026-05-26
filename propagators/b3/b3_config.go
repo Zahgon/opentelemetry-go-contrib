@@ -18,25 +18,19 @@ type Option interface {
 type optionFunc func(*config)
 
 func (o optionFunc) apply(c *config) {
-	o(c)
+	_ = "STUB: not implemented"
+
+	// newConfig creates a new config struct and applies opts to it.
+	return
 }
 
-// newConfig creates a new config struct and applies opts to it.
-func newConfig(opts ...Option) *config {
-	c := &config{}
-	for _, opt := range opts {
-		opt.apply(c)
-	}
-	return c
-}
+func newConfig(opts ...Option) *config { _ = "STUB: not implemented"; return nil }
 
 // Encoding is a bitmask representation of the B3 encoding type.
 type Encoding uint8
 
 // supports returns if e has o bit(s) set.
-func (e Encoding) supports(o Encoding) bool {
-	return e&o == o
-}
+func (e Encoding) supports(o Encoding) bool { _ = "STUB: not implemented"; return false }
 
 const (
 	// B3Unspecified is an unspecified B3 encoding.
@@ -61,8 +55,4 @@ const (
 //	WithInjectEncoding(B3SingleHeader | B3MultipleHeader)
 //
 // means the propagator will inject both single and multi B3 headers.
-func WithInjectEncoding(encoding Encoding) Option {
-	return optionFunc(func(c *config) {
-		c.InjectEncoding = encoding
-	})
-}
+func WithInjectEncoding(encoding Encoding) Option { _ = "STUB: not implemented"; return *new(Option) }

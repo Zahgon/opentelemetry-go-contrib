@@ -26,7 +26,8 @@ type Option = SpanOption
 // WithFallbackSpanExporter sets the fallback exporter to use when no exporter
 // is configured through the OTEL_TRACES_EXPORTER environment variable.
 func WithFallbackSpanExporter(spanExporterFactory func(ctx context.Context) (trace.SpanExporter, error)) SpanOption {
-	return withFallbackFactory[trace.SpanExporter](spanExporterFactory)
+	_ = "STUB: not implemented"
+	return *new(SpanOption)
 }
 
 // NewSpanExporter returns a configured [go.opentelemetry.io/otel/sdk/trace.SpanExporter]
@@ -56,14 +57,16 @@ func WithFallbackSpanExporter(spanExporterFactory func(ctx context.Context) (tra
 //
 // Use [IsNoneSpanExporter] to check if the returned exporter is a "no operation" exporter.
 func NewSpanExporter(ctx context.Context, opts ...SpanOption) (trace.SpanExporter, error) {
-	return tracesSignal.create(ctx, opts...)
+	_ = "STUB: not implemented"
+	return *new(trace.SpanExporter), nil
 }
 
 // RegisterSpanExporter sets the SpanExporter factory to be used when the
 // OTEL_TRACES_EXPORTER environment variable contains the exporter name. This
 // will panic if name has already been registered.
 func RegisterSpanExporter(name string, factory func(context.Context) (trace.SpanExporter, error)) {
-	must(tracesSignal.registry.store(name, factory))
+	_ = "STUB: not implemented"
+	return
 }
 
 var tracesSignal = newSignal[trace.SpanExporter]("OTEL_TRACES_EXPORTER")

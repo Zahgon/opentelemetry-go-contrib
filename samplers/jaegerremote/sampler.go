@@ -19,14 +19,12 @@
 package jaegerremote // import "go.opentelemetry.io/contrib/samplers/jaegerremote"
 
 import (
-	"fmt"
 	"math"
 	"sync"
 
 	jaeger_api_v2 "github.com/jaegertracing/jaeger-idl/proto-gen/api_v2"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/trace"
-	oteltrace "go.opentelemetry.io/otel/trace"
 
 	"go.opentelemetry.io/contrib/samplers/jaegerremote/internal/ratelimiter"
 )
@@ -56,10 +54,8 @@ type probabilisticSampler struct {
 // newProbabilisticSampler creates a sampler that randomly samples a certain percentage of traces specified by the
 // samplingRate, in the range between 0.0 and 1.0. it utilizes the SDK `trace.TraceIDRatioBased` sampler.
 func newProbabilisticSampler(samplingRate float64, attributesDisabled bool) *probabilisticSampler {
-	s := &probabilisticSampler{
-		attributesDisabled: attributesDisabled,
-	}
-	return s.init(samplingRate)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (s *probabilisticSampler) init(samplingRate float64) *probabilisticSampler {
@@ -73,39 +69,28 @@ func (s *probabilisticSampler) init(samplingRate float64) *probabilisticSampler 
 }
 
 // SamplingRate returns the sampling probability this sampled was constructed with.
-func (s *probabilisticSampler) SamplingRate() float64 {
-	return s.samplingRate
-}
+func (s *probabilisticSampler) SamplingRate() float64 { _ = "STUB: not implemented"; return 0 }
 
 func (s *probabilisticSampler) ShouldSample(p trace.SamplingParameters) trace.SamplingResult {
-	r := s.sampler.ShouldSample(p)
-	if r.Decision == trace.Drop {
-		return r
-	}
-	r.Attributes = s.attributes
-	return r
+	_ = "STUB: not implemented"
+	return *new(trace.SamplingResult)
 }
 
 // Equal compares with another sampler.
 func (s *probabilisticSampler) Equal(other trace.Sampler) bool {
-	if o, ok := other.(*probabilisticSampler); ok {
-		return math.Abs(s.samplingRate-o.samplingRate) < 1e-9 // consider equal if within 0.000001%
-	}
+	_ = "STUB: not implemented"
 	return false
 }
 
+// consider equal if within 0.000001%
+
 // Update modifies in-place the sampling rate. Locking must be done externally.
 func (s *probabilisticSampler) Update(samplingRate float64) error {
-	if samplingRate < 0.0 || samplingRate > 1.0 {
-		return fmt.Errorf("sampling rate must be between 0.0 and 1.0, received %f", samplingRate)
-	}
-	s.init(samplingRate)
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (s *probabilisticSampler) Description() string {
-	return s.sampler.Description()
-}
+func (s *probabilisticSampler) Description() string { _ = "STUB: not implemented"; return "" }
 
 // -----------------------
 
@@ -122,11 +107,8 @@ type rateLimitingSampler struct {
 
 // newRateLimitingSampler creates new rateLimitingSampler.
 func newRateLimitingSampler(maxTracesPerSecond float64, attributesDisabled bool) *rateLimitingSampler {
-	s := &rateLimitingSampler{
-		attributesDisabled: attributesDisabled,
-	}
-
-	return s.init(maxTracesPerSecond)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (s *rateLimitingSampler) init(maxTracesPerSecond float64) *rateLimitingSampler {
@@ -144,39 +126,21 @@ func (s *rateLimitingSampler) init(maxTracesPerSecond float64) *rateLimitingSamp
 }
 
 func (s *rateLimitingSampler) ShouldSample(p trace.SamplingParameters) trace.SamplingResult {
-	psc := oteltrace.SpanContextFromContext(p.ParentContext)
-	if s.rateLimiter.CheckCredit(1.0) {
-		return trace.SamplingResult{
-			Decision:   trace.RecordAndSample,
-			Tracestate: psc.TraceState(),
-			Attributes: s.attributes,
-		}
-	}
-	return trace.SamplingResult{
-		Decision:   trace.Drop,
-		Tracestate: psc.TraceState(),
-	}
+	_ = "STUB: not implemented"
+	return *new(trace.SamplingResult)
 }
 
 // Update reconfigures the rate limiter, while preserving its accumulated balance.
 // Locking must be done externally.
-func (s *rateLimitingSampler) Update(maxTracesPerSecond float64) {
-	if s.maxTracesPerSecond != maxTracesPerSecond {
-		s.init(maxTracesPerSecond)
-	}
-}
+func (s *rateLimitingSampler) Update(maxTracesPerSecond float64) { _ = "STUB: not implemented"; return }
 
 // Equal compares with another sampler.
 func (s *rateLimitingSampler) Equal(other trace.Sampler) bool {
-	if o, ok := other.(*rateLimitingSampler); ok {
-		return s.maxTracesPerSecond == o.maxTracesPerSecond
-	}
+	_ = "STUB: not implemented"
 	return false
 }
 
-func (*rateLimitingSampler) Description() string {
-	return "rateLimitingSampler{}"
-}
+func (*rateLimitingSampler) Description() string { _ = "STUB: not implemented"; return "" }
 
 // -----------------------
 
@@ -196,45 +160,31 @@ type guaranteedThroughputProbabilisticSampler struct {
 }
 
 func newGuaranteedThroughputProbabilisticSampler(lowerBound, samplingRate float64, attributesDisabled bool) *guaranteedThroughputProbabilisticSampler {
-	s := &guaranteedThroughputProbabilisticSampler{
-		lowerBoundSampler:  newRateLimitingSampler(lowerBound, attributesDisabled),
-		lowerBound:         lowerBound,
-		attributesDisabled: attributesDisabled,
-	}
-	s.setProbabilisticSampler(samplingRate)
-	return s
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (s *guaranteedThroughputProbabilisticSampler) setProbabilisticSampler(samplingRate float64) {
-	if s.probabilisticSampler == nil {
-		s.probabilisticSampler = newProbabilisticSampler(samplingRate, s.attributesDisabled)
-	} else if s.samplingRate != samplingRate {
-		s.probabilisticSampler.init(samplingRate)
-	}
-	// since we don't validate samplingRate, sampler may have clamped it to [0, 1] interval
-	s.samplingRate = s.probabilisticSampler.SamplingRate()
+	_ = "STUB: not implemented"
+	return
 }
 
+// since we don't validate samplingRate, sampler may have clamped it to [0, 1] interval
+
 func (s *guaranteedThroughputProbabilisticSampler) ShouldSample(p trace.SamplingParameters) trace.SamplingResult {
-	if result := s.probabilisticSampler.ShouldSample(p); result.Decision == trace.RecordAndSample {
-		s.lowerBoundSampler.ShouldSample(p)
-		return result
-	}
-	result := s.lowerBoundSampler.ShouldSample(p)
-	return result
+	_ = "STUB: not implemented"
+	return *new(trace.SamplingResult)
 }
 
 // this function should only be called while holding a Write lock.
 func (s *guaranteedThroughputProbabilisticSampler) update(lowerBound, samplingRate float64) {
-	s.setProbabilisticSampler(samplingRate)
-	if s.lowerBound != lowerBound {
-		s.lowerBoundSampler.Update(lowerBound)
-		s.lowerBound = lowerBound
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 func (*guaranteedThroughputProbabilisticSampler) Description() string {
-	return "guaranteedThroughputProbabilisticSampler{}"
+	_ = "STUB: not implemented"
+	return ""
 }
 
 // -----------------------
@@ -273,85 +223,27 @@ type perOperationSamplerParams struct {
 
 // newPerOperationSampler returns a new perOperationSampler.
 func newPerOperationSampler(params perOperationSamplerParams, attributesDisabled bool) *perOperationSampler {
-	if params.MaxOperations <= 0 {
-		params.MaxOperations = defaultMaxOperations
-	}
-	samplers := make(map[string]*guaranteedThroughputProbabilisticSampler)
-	for _, strategy := range params.Strategies.PerOperationStrategies {
-		sampler := newGuaranteedThroughputProbabilisticSampler(
-			params.Strategies.DefaultLowerBoundTracesPerSecond,
-			strategy.ProbabilisticSampling.SamplingRate,
-			attributesDisabled,
-		)
-		samplers[strategy.Operation] = sampler
-	}
-	return &perOperationSampler{
-		samplers:                 samplers,
-		defaultSampler:           newProbabilisticSampler(params.Strategies.DefaultSamplingProbability, attributesDisabled),
-		lowerBound:               params.Strategies.DefaultLowerBoundTracesPerSecond,
-		maxOperations:            params.MaxOperations,
-		operationNameLateBinding: params.OperationNameLateBinding,
-		attributesDisabled:       attributesDisabled,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (s *perOperationSampler) ShouldSample(p trace.SamplingParameters) trace.SamplingResult {
-	sampler := s.getSamplerForOperation(p.Name)
-	return sampler.ShouldSample(p)
+	_ = "STUB: not implemented"
+	return *new(trace.SamplingResult)
 }
 
 func (s *perOperationSampler) getSamplerForOperation(operation string) trace.Sampler {
-	s.RLock()
-	sampler, ok := s.samplers[operation]
-	if ok {
-		defer s.RUnlock()
-		return sampler
-	}
-	s.RUnlock()
-	s.Lock()
-	defer s.Unlock()
-
-	// Check if sampler has already been created
-	sampler, ok = s.samplers[operation]
-	if ok {
-		return sampler
-	}
-	// Store only up to maxOperations of unique ops.
-	if len(s.samplers) >= s.maxOperations {
-		return s.defaultSampler
-	}
-	newSampler := newGuaranteedThroughputProbabilisticSampler(s.lowerBound, s.defaultSampler.SamplingRate(), s.attributesDisabled)
-	s.samplers[operation] = newSampler
-	return newSampler
+	_ = "STUB: not implemented"
+	return *new(trace.Sampler)
 }
 
-func (*perOperationSampler) Description() string {
-	return "perOperationSampler{}"
-}
+// Check if sampler has already been created
+
+// Store only up to maxOperations of unique ops.
+
+func (*perOperationSampler) Description() string { _ = "STUB: not implemented"; return "" }
 
 func (s *perOperationSampler) update(strategies *jaeger_api_v2.PerOperationSamplingStrategies) {
-	s.Lock()
-	defer s.Unlock()
-	newSamplers := map[string]*guaranteedThroughputProbabilisticSampler{}
-	for _, strategy := range strategies.PerOperationStrategies {
-		operation := strategy.Operation
-		samplingRate := strategy.ProbabilisticSampling.SamplingRate
-		lowerBound := strategies.DefaultLowerBoundTracesPerSecond
-		if sampler, ok := s.samplers[operation]; ok {
-			sampler.update(lowerBound, samplingRate)
-			newSamplers[operation] = sampler
-		} else {
-			sampler := newGuaranteedThroughputProbabilisticSampler(
-				lowerBound,
-				samplingRate,
-				s.attributesDisabled,
-			)
-			newSamplers[operation] = sampler
-		}
-	}
-	s.lowerBound = strategies.DefaultLowerBoundTracesPerSecond
-	if s.defaultSampler.SamplingRate() != strategies.DefaultSamplingProbability {
-		s.defaultSampler = newProbabilisticSampler(strategies.DefaultSamplingProbability, s.attributesDisabled)
-	}
-	s.samplers = newSamplers
+	_ = "STUB: not implemented"
+	return
 }

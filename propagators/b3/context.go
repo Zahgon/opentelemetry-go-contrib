@@ -14,36 +14,22 @@ const (
 
 // withDebug returns a copy of parent with debug set as the debug flag value .
 func withDebug(parent context.Context, debug bool) context.Context {
-	return context.WithValue(parent, debugKey, debug)
+	_ = "STUB: not implemented"
+	return *new(context.Context)
 }
 
 // debugFromContext returns the debug value stored in ctx.
 //
 // If no debug value is stored in ctx false is returned.
-func debugFromContext(ctx context.Context) bool {
-	if ctx == nil {
-		return false
-	}
-	if debug, ok := ctx.Value(debugKey).(bool); ok {
-		return debug
-	}
-	return false
-}
+func debugFromContext(ctx context.Context) bool { _ = "STUB: not implemented"; return false }
 
 // withDeferred returns a copy of parent with deferred set as the deferred flag value .
 func withDeferred(parent context.Context, deferred bool) context.Context {
-	return context.WithValue(parent, deferredKey, deferred)
+	_ = "STUB: not implemented"
+	return *new(context.Context)
 }
 
 // deferredFromContext returns the deferred value stored in ctx.
 //
 // If no deferred value is stored in ctx false is returned.
-func deferredFromContext(ctx context.Context) bool {
-	if ctx == nil {
-		return false
-	}
-	if deferred, ok := ctx.Value(deferredKey).(bool); ok {
-		return deferred
-	}
-	return false
-}
+func deferredFromContext(ctx context.Context) bool { _ = "STUB: not implemented"; return false }

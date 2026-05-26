@@ -6,7 +6,6 @@ package runtime // import "go.opentelemetry.io/contrib/instrumentation/runtime"
 import (
 	"time"
 
-	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/metric"
 )
 
@@ -44,56 +43,37 @@ const DefaultMinimumReadMemStatsInterval time.Duration = 15 * time.Second
 // runtime.ReadMemStats(), which is a relatively expensive call to make
 // frequently.  This setting is ignored when `d` is negative.
 func WithMinimumReadMemStatsInterval(d time.Duration) Option {
-	return minimumReadMemStatsIntervalOption(d)
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 type minimumReadMemStatsIntervalOption time.Duration
 
-func (o minimumReadMemStatsIntervalOption) apply(c *config) {
-	if o >= 0 {
-		c.MinimumReadMemStatsInterval = time.Duration(o)
-	}
+func (o minimumReadMemStatsIntervalOption) apply(c *config) { _ = "STUB: not implemented"; return }
+
+func (o minimumReadMemStatsIntervalOption) applyProducer(c *config) {
+	_ = "STUB: not implemented"
+
+	// WithMeterProvider sets the Metric implementation to use for
+	// reporting.  If this option is not used, the global metric.MeterProvider
+	// will be used.  `provider` must be non-nil.
+	return
 }
 
-func (o minimumReadMemStatsIntervalOption) applyProducer(c *config) { o.apply(c) }
-
-// WithMeterProvider sets the Metric implementation to use for
-// reporting.  If this option is not used, the global metric.MeterProvider
-// will be used.  `provider` must be non-nil.
 func WithMeterProvider(provider metric.MeterProvider) Option {
-	return metricProviderOption{provider}
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 type metricProviderOption struct{ metric.MeterProvider }
 
-func (o metricProviderOption) apply(c *config) {
-	if o.MeterProvider != nil {
-		c.MeterProvider = o.MeterProvider
-	}
-}
+func (o metricProviderOption) apply(c *config) { _ = "STUB: not implemented"; return }
 
 // newConfig computes a config from the supplied Options.
-func newConfig(opts ...Option) config {
-	c := config{
-		MeterProvider: otel.GetMeterProvider(),
-	}
-	for _, opt := range opts {
-		opt.apply(&c)
-	}
-	if c.MinimumReadMemStatsInterval <= 0 {
-		c.MinimumReadMemStatsInterval = DefaultMinimumReadMemStatsInterval
-	}
-	return c
-}
+func newConfig(opts ...Option) config { _ = "STUB: not implemented"; return *new(config) }
 
 // newConfig computes a config from the supplied ProducerOptions.
 func newProducerConfig(opts ...ProducerOption) config {
-	c := config{}
-	for _, opt := range opts {
-		opt.applyProducer(&c)
-	}
-	if c.MinimumReadMemStatsInterval <= 0 {
-		c.MinimumReadMemStatsInterval = DefaultMinimumReadMemStatsInterval
-	}
-	return c
+	_ = "STUB: not implemented"
+	return *new(config)
 }

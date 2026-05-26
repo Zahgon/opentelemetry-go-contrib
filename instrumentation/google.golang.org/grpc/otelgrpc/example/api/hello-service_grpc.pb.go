@@ -11,9 +11,8 @@ package api
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
-	codes "google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -43,59 +42,34 @@ type helloServiceClient struct {
 }
 
 func NewHelloServiceClient(cc grpc.ClientConnInterface) HelloServiceClient {
-	return &helloServiceClient{cc}
+	_ = "STUB: not implemented"
+	return *new(HelloServiceClient)
 }
 
 func (c *helloServiceClient) SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(HelloResponse)
-	err := c.cc.Invoke(ctx, HelloService_SayHello_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *helloServiceClient) SayHelloServerStream(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[HelloResponse], error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &HelloService_ServiceDesc.Streams[0], HelloService_SayHelloServerStream_FullMethodName, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &grpc.GenericClientStream[HelloRequest, HelloResponse]{ClientStream: stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type HelloService_SayHelloServerStreamClient = grpc.ServerStreamingClient[HelloResponse]
 
 func (c *helloServiceClient) SayHelloClientStream(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[HelloRequest, HelloResponse], error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &HelloService_ServiceDesc.Streams[1], HelloService_SayHelloClientStream_FullMethodName, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &grpc.GenericClientStream[HelloRequest, HelloResponse]{ClientStream: stream}
-	return x, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type HelloService_SayHelloClientStreamClient = grpc.ClientStreamingClient[HelloRequest, HelloResponse]
 
 func (c *helloServiceClient) SayHelloBidiStream(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[HelloRequest, HelloResponse], error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &HelloService_ServiceDesc.Streams[2], HelloService_SayHelloBidiStream_FullMethodName, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &grpc.GenericClientStream[HelloRequest, HelloResponse]{ClientStream: stream}
-	return x, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
@@ -120,76 +94,75 @@ type HelloServiceServer interface {
 type UnimplementedHelloServiceServer struct{}
 
 func (UnimplementedHelloServiceServer) SayHello(context.Context, *HelloRequest) (*HelloResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method SayHello not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
-func (UnimplementedHelloServiceServer) SayHelloServerStream(*HelloRequest, grpc.ServerStreamingServer[HelloResponse]) error {
-	return status.Error(codes.Unimplemented, "method SayHelloServerStream not implemented")
-}
-func (UnimplementedHelloServiceServer) SayHelloClientStream(grpc.ClientStreamingServer[HelloRequest, HelloResponse]) error {
-	return status.Error(codes.Unimplemented, "method SayHelloClientStream not implemented")
-}
-func (UnimplementedHelloServiceServer) SayHelloBidiStream(grpc.BidiStreamingServer[HelloRequest, HelloResponse]) error {
-	return status.Error(codes.Unimplemented, "method SayHelloBidiStream not implemented")
-}
-func (UnimplementedHelloServiceServer) mustEmbedUnimplementedHelloServiceServer() {}
-func (UnimplementedHelloServiceServer) testEmbeddedByValue()                      {}
 
-// UnsafeHelloServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to HelloServiceServer will
-// result in compilation errors.
+func (UnimplementedHelloServiceServer) SayHelloServerStream(*HelloRequest, grpc.ServerStreamingServer[HelloResponse]) error {
+	_ = "STUB: not implemented"
+	return nil
+}
+
+func (UnimplementedHelloServiceServer) SayHelloClientStream(grpc.ClientStreamingServer[HelloRequest, HelloResponse]) error {
+	_ = "STUB: not implemented"
+	return nil
+}
+
+func (UnimplementedHelloServiceServer) SayHelloBidiStream(grpc.BidiStreamingServer[HelloRequest, HelloResponse]) error {
+	_ = "STUB: not implemented"
+	return nil
+}
+
+func (UnimplementedHelloServiceServer) mustEmbedUnimplementedHelloServiceServer() {
+	_ = "STUB: not implemented"
+	return
+}
+func (UnimplementedHelloServiceServer) testEmbeddedByValue() {
+	_ = "STUB: not implemented"
+
+	// UnsafeHelloServiceServer may be embedded to opt out of forward compatibility for this service.
+	// Use of this interface is not recommended, as added methods to HelloServiceServer will
+	// result in compilation errors.
+	return
+}
+
 type UnsafeHelloServiceServer interface {
 	mustEmbedUnimplementedHelloServiceServer()
 }
 
 func RegisterHelloServiceServer(s grpc.ServiceRegistrar, srv HelloServiceServer) {
+	_ = "STUB: not implemented"
 	// If the following call panics, it indicates UnimplementedHelloServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
-	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
-		t.testEmbeddedByValue()
-	}
-	s.RegisterService(&HelloService_ServiceDesc, srv)
+	return
 }
 
 func _HelloService_SayHello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(HelloRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(HelloServiceServer).SayHello(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: HelloService_SayHello_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(HelloServiceServer).SayHello(ctx, req.(*HelloRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _HelloService_SayHelloServerStream_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(HelloRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(HelloServiceServer).SayHelloServerStream(m, &grpc.GenericServerStream[HelloRequest, HelloResponse]{ServerStream: stream})
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type HelloService_SayHelloServerStreamServer = grpc.ServerStreamingServer[HelloResponse]
 
 func _HelloService_SayHelloClientStream_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(HelloServiceServer).SayHelloClientStream(&grpc.GenericServerStream[HelloRequest, HelloResponse]{ServerStream: stream})
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type HelloService_SayHelloClientStreamServer = grpc.ClientStreamingServer[HelloRequest, HelloResponse]
 
 func _HelloService_SayHelloBidiStream_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(HelloServiceServer).SayHelloBidiStream(&grpc.GenericServerStream[HelloRequest, HelloResponse]{ServerStream: stream})
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.

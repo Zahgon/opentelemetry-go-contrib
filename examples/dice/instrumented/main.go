@@ -6,16 +6,8 @@
 package main
 
 import (
-	"context"
-	"errors"
 	"log"
-	"net"
 	"net/http"
-	"os"
-	"os/signal"
-	"time"
-
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 func main() {
@@ -25,57 +17,32 @@ func main() {
 }
 
 func run() error {
+	_ = "STUB: not implemented"
 	// Handle SIGINT (CTRL+C) gracefully.
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
-	defer stop()
-
-	// Set up OpenTelemetry.
-	otelShutdown, err := setupOTelSDK(ctx)
-	if err != nil {
-		return err
-	}
-	// Handle shutdown properly so nothing leaks.
-	defer func() {
-		err = errors.Join(err, otelShutdown(context.Background()))
-	}()
-
-	// Start HTTP server.
-	srv := &http.Server{
-		Addr:         ":8080",
-		BaseContext:  func(net.Listener) context.Context { return ctx },
-		ReadTimeout:  time.Second,
-		WriteTimeout: 10 * time.Second,
-		Handler:      newHTTPHandler(),
-	}
-	srvErr := make(chan error, 1)
-	go func() {
-		srvErr <- srv.ListenAndServe()
-	}()
-
-	// Wait for interruption.
-	select {
-	case err = <-srvErr:
-		// Error when starting HTTP server.
-		return err
-	case <-ctx.Done():
-		// Wait for first CTRL+C.
-		// Stop receiving signal notifications as soon as possible.
-		stop()
-	}
-
-	// When Shutdown is called, ListenAndServe immediately returns ErrServerClosed.
-	err = srv.Shutdown(context.Background())
-	return err
+	return nil
 }
+
+// Set up OpenTelemetry.
+
+// Handle shutdown properly so nothing leaks.
+
+// Start HTTP server.
+
+// Wait for interruption.
+
+// Error when starting HTTP server.
+
+// Wait for first CTRL+C.
+// Stop receiving signal notifications as soon as possible.
+
+// When Shutdown is called, ListenAndServe immediately returns ErrServerClosed.
 
 func newHTTPHandler() http.Handler {
-	mux := http.NewServeMux()
+	_ = "STUB: not implemented"
+	return *
 
 	// Register handlers.
-	mux.Handle("/rolldice", http.HandlerFunc(rolldice))
-	mux.Handle("/rolldice/{player}", http.HandlerFunc(rolldice))
-
-	// Add HTTP instrumentation for the whole server.
-	handler := otelhttp.NewHandler(mux, "/")
-	return handler
+	new(http.Handler)
 }
+
+// Add HTTP instrumentation for the whole server.

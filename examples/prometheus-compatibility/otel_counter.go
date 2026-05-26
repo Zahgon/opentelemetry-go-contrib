@@ -18,14 +18,7 @@ var (
 )
 
 func otelCounterUsage(ctx context.Context, meter metric.Meter) {
+	_ = "STUB: not implemented"
 	// No upfront label declaration: attributes are provided at record time.
-	hvacOnTime, err := meter.Float64Counter("hvac.on",
-		metric.WithDescription("Total time the HVAC system has been running"),
-		metric.WithUnit("s"))
-	if err != nil {
-		panic(err)
-	}
-
-	hvacOnTime.Add(ctx, 127.5, zoneUpstairsOpts...)
-	hvacOnTime.Add(ctx, 3600.0, zoneDownstairsOpts...)
+	return
 }

@@ -10,17 +10,11 @@ package semconv // import "go.opentelemetry.io/contrib/instrumentation/net/http/
 
 import (
 	"context"
-	"fmt"
 	"net/http"
-	"reflect"
-	"slices"
-	"strconv"
-	"strings"
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/semconv/v1.41.0"
 	"go.opentelemetry.io/otel/semconv/v1.41.0/httpconv"
 )
 
@@ -30,33 +24,18 @@ type HTTPClient struct {
 }
 
 func NewHTTPClient(meter metric.Meter) HTTPClient {
-	client := HTTPClient{}
-
-	var err error
-	client.requestBodySize, err = httpconv.NewClientRequestBodySize(meter)
-	handleErr(err)
-
-	client.requestDuration, err = httpconv.NewClientRequestDuration(
-		meter,
-		metric.WithExplicitBucketBoundaries(0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10),
-	)
-	handleErr(err)
-
-	return client
+	_ = "STUB: not implemented"
+	return *new(HTTPClient)
 }
 
 func (n HTTPClient) Status(code int) (codes.Code, string) {
-	if code < 100 || code >= 600 {
-		return codes.Error, fmt.Sprintf("Invalid HTTP status code %d", code)
-	}
-	if code >= 400 {
-		return codes.Error, ""
-	}
-	return codes.Unset, ""
+	_ = "STUB: not implemented"
+	return *new(codes.Code), ""
 }
 
 // RequestTraceAttrs returns trace attributes for an HTTP request made by a client.
 func (n HTTPClient) RequestTraceAttrs(req *http.Request) []attribute.KeyValue {
+	_ = "STUB: not implemented"
 	/*
 	 below attributes are returned:
 	 - http.request.method
@@ -66,173 +45,33 @@ func (n HTTPClient) RequestTraceAttrs(req *http.Request) []attribute.KeyValue {
 	 - server.port
 	 - network.protocol.name
 	 - network.protocol.version
-	*/
-	numOfAttributes := 3 // URL, server address, proto, and method.
-
-	var urlHost string
-	if req.URL != nil {
-		urlHost = req.URL.Host
-	}
-	var requestHost string
-	var requestPort int
-	for _, hostport := range []string{urlHost, req.Header.Get("Host")} {
-		requestHost, requestPort = SplitHostPort(hostport)
-		if requestHost != "" || requestPort > 0 {
-			break
-		}
-	}
-
-	eligiblePort := requiredHTTPPort(req.URL != nil && req.URL.Scheme == "https", requestPort)
-	if eligiblePort > 0 {
-		numOfAttributes++
-	}
-	useragent := req.UserAgent()
-	if useragent != "" {
-		numOfAttributes++
-	}
-
-	protoName, protoVersion := netProtocol(req.Proto)
-	if protoName != "" && protoName != "http" {
-		numOfAttributes++
-	}
-	if protoVersion != "" {
-		numOfAttributes++
-	}
-
-	method, originalMethod := n.method(req.Method)
-	if originalMethod != (attribute.KeyValue{}) {
-		numOfAttributes++
-	}
-
-	attrs := make([]attribute.KeyValue, 0, numOfAttributes)
-
-	attrs = append(attrs, method)
-	if originalMethod != (attribute.KeyValue{}) {
-		attrs = append(attrs, originalMethod)
-	}
-
-	var u string
-	if req.URL != nil {
-		// Remove any username/password info that may be in the URL.
-		userinfo := req.URL.User
-		req.URL.User = nil
-		u = req.URL.String()
-		// Restore any username/password info that was removed.
-		req.URL.User = userinfo
-	}
-	attrs = append(attrs, semconv.URLFull(u))
-
-	attrs = append(attrs, semconv.ServerAddress(requestHost))
-	if eligiblePort > 0 {
-		attrs = append(attrs, semconv.ServerPort(eligiblePort))
-	}
-
-	if protoName != "" && protoName != "http" {
-		attrs = append(attrs, semconv.NetworkProtocolName(protoName))
-	}
-	if protoVersion != "" {
-		attrs = append(attrs, semconv.NetworkProtocolVersion(protoVersion))
-	}
-
-	return attrs
+	*/return nil
 }
+
+// URL, server address, proto, and method.
+
+// Remove any username/password info that may be in the URL.
+
+// Restore any username/password info that was removed.
 
 // ResponseTraceAttrs returns trace attributes for an HTTP response made by a client.
 func (n HTTPClient) ResponseTraceAttrs(resp *http.Response) []attribute.KeyValue {
+	_ = "STUB: not implemented"
 	/*
 	 below attributes are returned:
 	 - http.response.status_code
 	 - error.type
-	*/
-	var count int
-	if resp.StatusCode > 0 {
-		count++
-	}
-
-	if isErrorStatusCode(resp.StatusCode) {
-		count++
-	}
-
-	attrs := make([]attribute.KeyValue, 0, count)
-	if resp.StatusCode > 0 {
-		attrs = append(attrs, semconv.HTTPResponseStatusCode(resp.StatusCode))
-	}
-
-	if isErrorStatusCode(resp.StatusCode) {
-		errorType := strconv.Itoa(resp.StatusCode)
-		attrs = append(attrs, semconv.ErrorTypeKey.String(errorType))
-	}
-	return attrs
+	*/return nil
 }
 
 func (n HTTPClient) method(method string) (attribute.KeyValue, attribute.KeyValue) {
-	if method == "" {
-		return semconv.HTTPRequestMethodOther, attribute.KeyValue{}
-	}
-	if attr, ok := methodLookup[method]; ok {
-		return attr, attribute.KeyValue{}
-	}
-
-	orig := semconv.HTTPRequestMethodOriginal(method)
-	if attr, ok := methodLookup[strings.ToUpper(method)]; ok {
-		return attr, orig
-	}
-	return semconv.HTTPRequestMethodOther, orig
+	_ = "STUB: not implemented"
+	return *new(attribute.KeyValue), *new(attribute.KeyValue)
 }
 
 func (n HTTPClient) MetricAttributes(req *http.Request, statusCode int, additionalAttributes []attribute.KeyValue) []attribute.KeyValue {
-	num := len(additionalAttributes) + 2
-	var h string
-	if req.URL != nil {
-		h = req.URL.Host
-	}
-	var requestHost string
-	var requestPort int
-	for _, hostport := range []string{h, req.Header.Get("Host")} {
-		requestHost, requestPort = SplitHostPort(hostport)
-		if requestHost != "" || requestPort > 0 {
-			break
-		}
-	}
-
-	port := requiredHTTPPort(req.URL != nil && req.URL.Scheme == "https", requestPort)
-	if port > 0 {
-		num++
-	}
-
-	protoName, protoVersion := netProtocol(req.Proto)
-	if protoName != "" {
-		num++
-	}
-	if protoVersion != "" {
-		num++
-	}
-
-	if statusCode > 0 {
-		num++
-	}
-
-	attributes := slices.Grow(additionalAttributes, num)
-	attributes = append(attributes,
-		semconv.HTTPRequestMethodKey.String(standardizeHTTPMethod(req.Method)),
-		semconv.ServerAddress(requestHost),
-		n.scheme(req),
-	)
-
-	if port > 0 {
-		attributes = append(attributes, semconv.ServerPort(port))
-	}
-	if protoName != "" {
-		attributes = append(attributes, semconv.NetworkProtocolName(protoName))
-	}
-	if protoVersion != "" {
-		attributes = append(attributes, semconv.NetworkProtocolVersion(protoVersion))
-	}
-
-	if statusCode > 0 {
-		attributes = append(attributes, semconv.HTTPResponseStatusCode(statusCode))
-	}
-	return attributes
+	_ = "STUB: not implemented"
+	return nil
 }
 
 type MetricOpts struct {
@@ -241,24 +80,18 @@ type MetricOpts struct {
 }
 
 func (o MetricOpts) MeasurementOption() metric.MeasurementOption {
-	return o.measurement
+	_ = "STUB: not implemented"
+	return *new(metric.MeasurementOption)
 }
 
 func (o MetricOpts) AddOptions() metric.AddOption {
-	return o.addOptions
+	_ = "STUB: not implemented"
+	return *new(metric.AddOption)
 }
 
 func (n HTTPClient) MetricOptions(ma MetricAttributes) MetricOpts {
-	attributes := n.MetricAttributes(ma.Req, ma.StatusCode, ma.AdditionalAttributes)
-	if ma.StatusCode == 0 && ma.Err != nil {
-		attributes = append(attributes, n.ErrorType(ma.Err))
-	}
-	set := metric.WithAttributeSet(attribute.NewSet(attributes...))
-
-	return MetricOpts{
-		measurement: set,
-		addOptions:  set,
-	}
+	_ = "STUB: not implemented"
+	return *new(MetricOpts)
 }
 
 // ErrorType returns an error.type attribute for the given error. The otelhttp
@@ -270,59 +103,28 @@ func (n HTTPClient) MetricOptions(ma MetricAttributes) MetricOpts {
 // OTel spec (error.type SHOULD have low cardinality). Callers that need
 // finer-grained error distinctions should inspect the error themselves.
 func (n HTTPClient) ErrorType(err error) attribute.KeyValue {
-	t := reflect.TypeOf(err)
-	if t == nil {
-		return semconv.ErrorTypeOther
-	}
-	if t.Kind() == reflect.Ptr {
-		t = t.Elem()
-	}
-	var value string
-	if t.PkgPath() == "" || t.Name() == "" {
-		// t.PkgPath() == "" covers builtin and unnamed types.
-		// t.Name() == "" covers anonymous struct types that implement error,
-		// which are uncommon but possible. Fall back to t.String() for both.
-		value = t.String()
-	} else {
-		value = fmt.Sprintf("%s.%s", t.PkgPath(), t.Name())
-	}
-
-	if value == "" {
-		return semconv.ErrorTypeOther
-	}
-
-	return semconv.ErrorTypeKey.String(value)
+	_ = "STUB: not implemented"
+	return *new(attribute.KeyValue)
 }
 
-func (n HTTPClient) RecordMetrics(ctx context.Context, md MetricData, opts MetricOpts) {
-	recordOpts := metricRecordOptionPool.Get().(*[]metric.RecordOption)
-	defer func() {
-		*recordOpts = (*recordOpts)[:0]
-		metricRecordOptionPool.Put(recordOpts)
-	}()
-	*recordOpts = append(*recordOpts, opts.MeasurementOption())
+// t.PkgPath() == "" covers builtin and unnamed types.
+// t.Name() == "" covers anonymous struct types that implement error,
+// which are uncommon but possible. Fall back to t.String() for both.
 
-	n.requestBodySize.Inst().Record(ctx, md.RequestSize, *recordOpts...)
-	n.requestDuration.Inst().Record(ctx, durationToSeconds(md.RequestDuration), *recordOpts...)
+func (n HTTPClient) RecordMetrics(ctx context.Context, md MetricData, opts MetricOpts) {
+	_ = "STUB: not implemented"
+	return
 }
 
 // TraceAttributes returns attributes for httptrace.
 func (n HTTPClient) TraceAttributes(host string) []attribute.KeyValue {
-	return []attribute.KeyValue{
-		semconv.ServerAddress(host),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (n HTTPClient) scheme(req *http.Request) attribute.KeyValue {
-	if req.URL != nil && req.URL.Scheme != "" {
-		return semconv.URLScheme(req.URL.Scheme)
-	}
-	if req.TLS != nil {
-		return semconv.URLScheme("https")
-	}
-	return semconv.URLScheme("http")
+	_ = "STUB: not implemented"
+	return *new(attribute.KeyValue)
 }
 
-func isErrorStatusCode(code int) bool {
-	return code >= 400 || code < 100
-}
+func isErrorStatusCode(code int) bool { _ = "STUB: not implemented"; return false }

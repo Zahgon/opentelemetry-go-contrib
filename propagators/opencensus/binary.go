@@ -7,8 +7,6 @@ package opencensus // import "go.opentelemetry.io/contrib/propagators/opencensus
 import (
 	"context"
 
-	ocpropagation "go.opencensus.io/trace/propagation"
-	"go.opentelemetry.io/otel/bridge/opencensus"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -30,46 +28,20 @@ var _ propagation.TextMapPropagator = Binary{}
 
 // Inject injects context into the TextMapCarrier.
 func (Binary) Inject(ctx context.Context, carrier propagation.TextMapCarrier) {
-	binaryContext := ctx.Value(binaryKey)
-	if state, ok := binaryContext.(string); binaryContext != nil && ok {
-		carrier.Set(binaryHeader, state)
-	}
-
-	sc := trace.SpanContextFromContext(ctx)
-	if !sc.IsValid() {
-		return
-	}
-	h := ocpropagation.Binary(opencensus.OTelSpanContextToOC(sc))
-	carrier.Set(binaryHeader, string(h))
+	_ = "STUB: not implemented"
+	return
 }
 
 // Extract extracts the SpanContext from the TextMapCarrier.
 func (b Binary) Extract(ctx context.Context, carrier propagation.TextMapCarrier) context.Context {
-	state := carrier.Get(binaryHeader)
-	if state != "" {
-		ctx = context.WithValue(ctx, binaryKey, state)
-	}
-
-	sc := b.extract(carrier)
-	if !sc.IsValid() {
-		return ctx
-	}
-	return trace.ContextWithRemoteSpanContext(ctx, sc)
+	_ = "STUB: not implemented"
+	return *new(context.Context)
 }
 
 func (Binary) extract(carrier propagation.TextMapCarrier) trace.SpanContext {
-	h := carrier.Get(binaryHeader)
-	if h == "" {
-		return trace.SpanContext{}
-	}
-	ocContext, ok := ocpropagation.FromBinary([]byte(h))
-	if !ok {
-		return trace.SpanContext{}
-	}
-	return opencensus.OCSpanContextToOTel(ocContext)
+	_ = "STUB: not implemented"
+	return *new(trace.SpanContext)
 }
 
 // Fields returns the fields that this propagator modifies.
-func (Binary) Fields() []string {
-	return []string{binaryHeader}
-}
+func (Binary) Fields() []string { _ = "STUB: not implemented"; return nil }

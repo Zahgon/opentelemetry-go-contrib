@@ -11,16 +11,8 @@ var hvacOnTime = prometheus.NewCounterVec(prometheus.CounterOpts{
 	Help: "Total time the HVAC system has been running, in seconds",
 }, []string{"zone"})
 
-func prometheusCounterUsage(reg *prometheus.Registry) {
-	reg.MustRegister(hvacOnTime)
+func prometheusCounterUsage(reg *prometheus.Registry) { _ = "STUB: not implemented"; return }
 
-	// Pre-bind to label value sets: subsequent calls avoid the series lookup.
-	upstairs := hvacOnTime.WithLabelValues("upstairs")
-	downstairs := hvacOnTime.WithLabelValues("downstairs")
+// Pre-bind to label value sets: subsequent calls avoid the series lookup.
 
-	upstairs.Add(127.5)
-	downstairs.Add(3600.0)
-
-	// Pre-initialize a series so it appears in /metrics with value 0.
-	hvacOnTime.WithLabelValues("basement")
-}
+// Pre-initialize a series so it appears in /metrics with value 0.

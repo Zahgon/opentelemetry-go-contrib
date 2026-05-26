@@ -23,7 +23,8 @@ var logsSignal = newSignal[log.Exporter]("OTEL_LOGS_EXPORTER")
 // WithFallbackLogExporter sets the fallback exporter to use when no exporter
 // is configured through the OTEL_LOGS_EXPORTER environment variable.
 func WithFallbackLogExporter(logExporterFactory func(ctx context.Context) (log.Exporter, error)) LogOption {
-	return withFallbackFactory[log.Exporter](logExporterFactory)
+	_ = "STUB: not implemented"
+	return *new(LogOption)
 }
 
 // NewLogExporter returns a configured [go.opentelemetry.io/otel/sdk/log.Exporter]
@@ -53,14 +54,16 @@ func WithFallbackLogExporter(logExporterFactory func(ctx context.Context) (log.E
 //
 // Use [IsNoneLogExporter] to check if the returned exporter is a "no operation" exporter.
 func NewLogExporter(ctx context.Context, opts ...LogOption) (log.Exporter, error) {
-	return logsSignal.create(ctx, opts...)
+	_ = "STUB: not implemented"
+	return *new(log.Exporter), nil
 }
 
 // RegisterLogExporter sets the log.Exporter factory to be used when the
 // OTEL_LOGS_EXPORTER environment variable contains the exporter name.
 // This will panic if name has already been registered.
 func RegisterLogExporter(name string, factory func(context.Context) (log.Exporter, error)) {
-	must(logsSignal.registry.store(name, factory))
+	_ = "STUB: not implemented"
+	return
 }
 
 func init() {

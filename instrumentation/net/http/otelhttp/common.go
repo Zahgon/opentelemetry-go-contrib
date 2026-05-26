@@ -23,5 +23,6 @@ const (
 type Filter func(*http.Request) bool
 
 func newTracer(tp trace.TracerProvider) trace.Tracer {
-	return tp.Tracer(ScopeName, trace.WithInstrumentationVersion(Version))
+	_ = "STUB: not implemented"
+	return *new(trace.Tracer)
 }

@@ -6,7 +6,6 @@ package otelconf // import "go.opentelemetry.io/contrib/otelconf/v0.2.0"
 
 import (
 	"context"
-	"errors"
 
 	"go.opentelemetry.io/otel/log"
 	nooplog "go.opentelemetry.io/otel/log/noop"
@@ -14,9 +13,6 @@ import (
 	noopmetric "go.opentelemetry.io/otel/metric/noop"
 	"go.opentelemetry.io/otel/trace"
 	nooptrace "go.opentelemetry.io/otel/trace/noop"
-	yaml "go.yaml.in/yaml/v3"
-
-	"go.opentelemetry.io/contrib/otelconf/internal/provider"
 )
 
 const (
@@ -35,11 +31,13 @@ type configOptions struct {
 type shutdownFunc func(context.Context) error
 
 func noopShutdown(context.Context) error {
+	_ = "STUB: not implemented"
+
+	// SDK is a struct that contains all the providers
+	// configured via the configuration model.
 	return nil
 }
 
-// SDK is a struct that contains all the providers
-// configured via the configuration model.
 type SDK struct {
 	meterProvider  metric.MeterProvider
 	tracerProvider trace.TracerProvider
@@ -49,23 +47,30 @@ type SDK struct {
 
 // TracerProvider returns a configured trace.TracerProvider.
 func (s *SDK) TracerProvider() trace.TracerProvider {
-	return s.tracerProvider
+	_ = "STUB: not implemented"
+	return *
+
+	// MeterProvider returns a configured metric.MeterProvider.
+	new(trace.TracerProvider)
 }
 
-// MeterProvider returns a configured metric.MeterProvider.
 func (s *SDK) MeterProvider() metric.MeterProvider {
-	return s.meterProvider
+	_ = "STUB: not implemented"
+	return *
+
+	// LoggerProvider returns a configured log.LoggerProvider.
+	new(metric.MeterProvider)
 }
 
-// LoggerProvider returns a configured log.LoggerProvider.
 func (s *SDK) LoggerProvider() log.LoggerProvider {
-	return s.loggerProvider
+	_ = "STUB: not implemented"
+	return *
+
+	// Shutdown calls shutdown on all configured providers.
+	new(log.LoggerProvider)
 }
 
-// Shutdown calls shutdown on all configured providers.
-func (s *SDK) Shutdown(ctx context.Context) error {
-	return s.shutdown(ctx)
-}
+func (s *SDK) Shutdown(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
 var noopSDK = SDK{
 	loggerProvider: nooplog.LoggerProvider{},
@@ -76,42 +81,8 @@ var noopSDK = SDK{
 
 // NewSDK creates SDK providers based on the configuration model.
 func NewSDK(opts ...ConfigurationOption) (SDK, error) {
-	o := configOptions{}
-	for _, opt := range opts {
-		o = opt.apply(o)
-	}
-	if o.opentelemetryConfig.Disabled != nil && *o.opentelemetryConfig.Disabled {
-		return noopSDK, nil
-	}
-
-	r, err := newResource(o.opentelemetryConfig.Resource)
-	if err != nil {
-		return noopSDK, err
-	}
-
-	mp, mpShutdown, err := meterProvider(o, r)
-	if err != nil {
-		return noopSDK, err
-	}
-
-	tp, tpShutdown, err := tracerProvider(o, r)
-	if err != nil {
-		return noopSDK, err
-	}
-
-	lp, lpShutdown, err := loggerProvider(o, r)
-	if err != nil {
-		return noopSDK, err
-	}
-
-	return SDK{
-		meterProvider:  mp,
-		tracerProvider: tp,
-		loggerProvider: lp,
-		shutdown: func(ctx context.Context) error {
-			return errors.Join(mpShutdown(ctx), tpShutdown(ctx), lpShutdown(ctx))
-		},
-	}, nil
+	_ = "STUB: not implemented"
+	return *new(SDK), nil
 }
 
 // ConfigurationOption configures options for providers.
@@ -122,38 +93,26 @@ type ConfigurationOption interface {
 type configurationOptionFunc func(configOptions) configOptions
 
 func (fn configurationOptionFunc) apply(cfg configOptions) configOptions {
-	return fn(cfg)
+	_ = "STUB: not implemented"
+
+	// WithContext sets the context.Context for the SDK.
+	return *new(configOptions)
 }
 
-// WithContext sets the context.Context for the SDK.
 func WithContext(ctx context.Context) ConfigurationOption {
-	return configurationOptionFunc(func(c configOptions) configOptions {
-		c.ctx = ctx
-		return c
-	})
+	_ = "STUB: not implemented"
+	return *new(ConfigurationOption)
 }
 
 // WithOpenTelemetryConfiguration sets the OpenTelemetryConfiguration used
 // to produce the SDK.
 func WithOpenTelemetryConfiguration(cfg OpenTelemetryConfiguration) ConfigurationOption {
-	return configurationOptionFunc(func(c configOptions) configOptions {
-		c.opentelemetryConfig = cfg
-		return c
-	})
+	_ = "STUB: not implemented"
+	return *new(ConfigurationOption)
 }
 
 // ParseYAML parses a YAML configuration file into an OpenTelemetryConfiguration.
 func ParseYAML(file []byte) (*OpenTelemetryConfiguration, error) {
-	file, err := provider.ReplaceEnvVars(file)
-	if err != nil {
-		return nil, err
-	}
-
-	var cfg OpenTelemetryConfiguration
-	err = yaml.Unmarshal(file, &cfg)
-	if err != nil {
-		return nil, err
-	}
-
-	return &cfg, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }

@@ -6,11 +6,8 @@ package gcp // import "go.opentelemetry.io/contrib/detectors/gcp"
 
 import (
 	"context"
-	"os"
 
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/resource"
-	semconv "go.opentelemetry.io/otel/semconv/v1.41.0"
 )
 
 const (
@@ -21,9 +18,8 @@ const (
 //
 // Deprecated: Use gcp.NewDetector() instead, which sets the same resource attributes.
 func NewCloudFunction() resource.Detector {
-	return &cloudFunction{
-		cloudRun: NewCloudRun(),
-	}
+	_ = "STUB: not implemented"
+	return *new(resource.Detector)
 }
 
 // cloudFunction collects resource information of GCP Cloud Function.
@@ -33,30 +29,11 @@ type cloudFunction struct {
 
 // Detect detects associated resources when running in GCP Cloud Function.
 func (f *cloudFunction) Detect(context.Context) (*resource.Resource, error) {
-	functionName, ok := f.googleCloudFunctionName()
-	if !ok {
-		return nil, nil
-	}
-
-	projectID, err := f.cloudRun.mc.ProjectID()
-	if err != nil {
-		return nil, err
-	}
-	region, err := f.cloudRun.cloudRegion()
-	if err != nil {
-		return nil, err
-	}
-
-	attributes := []attribute.KeyValue{
-		semconv.CloudProviderGCP,
-		semconv.CloudPlatformGCPCloudFunctions,
-		semconv.FaaSName(functionName),
-		semconv.CloudAccountID(projectID),
-		semconv.CloudRegion(region),
-	}
-	return resource.NewWithAttributes(semconv.SchemaURL, attributes...), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (*cloudFunction) googleCloudFunctionName() (string, bool) {
-	return os.LookupEnv(gcpFunctionNameKey)
+	_ = "STUB: not implemented"
+	return "", false
 }

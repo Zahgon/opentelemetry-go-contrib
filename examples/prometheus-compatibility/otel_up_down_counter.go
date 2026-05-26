@@ -18,15 +18,8 @@ var (
 )
 
 func otelUpDownCounterUsage(ctx context.Context, meter metric.Meter) {
-	devicesConnected, err := meter.Int64UpDownCounter("devices.connected",
-		metric.WithDescription("Number of smart home devices currently connected"))
-	if err != nil {
-		panic(err)
-	}
-
-	// Add() accepts positive and negative values.
-	devicesConnected.Add(ctx, 1, deviceThermostatAddOpts...)
-	devicesConnected.Add(ctx, 1, deviceThermostatAddOpts...)
-	devicesConnected.Add(ctx, 1, deviceLockAddOpts...)
-	devicesConnected.Add(ctx, -1, deviceLockAddOpts...)
+	_ = "STUB: not implemented"
+	return
 }
+
+// Add() accepts positive and negative values.

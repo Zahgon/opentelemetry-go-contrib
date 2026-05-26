@@ -55,12 +55,10 @@ package otellogr // import "go.opentelemetry.io/contrib/bridges/otellogr"
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/go-logr/logr"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/log"
-	"go.opentelemetry.io/otel/log/global"
 )
 
 type config struct {
@@ -72,31 +70,7 @@ type config struct {
 	levelSeverity func(int) log.Severity
 }
 
-func newConfig(options []Option) config {
-	var c config
-	for _, opt := range options {
-		c = opt.apply(c)
-	}
-
-	if c.provider == nil {
-		c.provider = global.GetLoggerProvider()
-	}
-
-	if c.levelSeverity == nil {
-		c.levelSeverity = func(level int) log.Severity {
-			switch level {
-			case 0:
-				return log.SeverityInfo
-			case 1:
-				return log.SeverityDebug
-			default:
-				return log.SeverityTrace
-			}
-		}
-	}
-
-	return c
-}
+func newConfig(options []Option) config { _ = "STUB: not implemented"; return *new(config) }
 
 // Option configures a [LogSink].
 type Option interface {
@@ -105,35 +79,27 @@ type Option interface {
 
 type optFunc func(config) config
 
-func (f optFunc) apply(c config) config { return f(c) }
+func (f optFunc) apply(c config) config {
+	_ = "STUB: not implemented"
 
-// WithVersion returns an [Option] that configures the version of the
-// [log.Logger] used by a [LogSink]. The version should be the version of the
-// package that is being logged.
-func WithVersion(version string) Option {
-	return optFunc(func(c config) config {
-		c.version = version
-		return c
-	})
+	// WithVersion returns an [Option] that configures the version of the
+	// [log.Logger] used by a [LogSink]. The version should be the version of the
+	// package that is being logged.
+	return *new(config)
 }
+
+func WithVersion(version string) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithSchemaURL returns an [Option] that configures the semantic convention
 // schema URL of the [log.Logger] used by a [LogSink]. The schemaURL should be
 // the schema URL for the semantic conventions used in log records.
-func WithSchemaURL(schemaURL string) Option {
-	return optFunc(func(c config) config {
-		c.schemaURL = schemaURL
-		return c
-	})
-}
+func WithSchemaURL(schemaURL string) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithAttributes returns an [Option] that configures the instrumentation scope
 // attributes of the [log.Logger] used by a [LogSink].
 func WithAttributes(attributes ...attribute.KeyValue) Option {
-	return optFunc(func(c config) config {
-		c.attributes = attributes
-		return c
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithLoggerProvider returns an [Option] that configures [log.LoggerProvider]
@@ -142,10 +108,8 @@ func WithAttributes(attributes ...attribute.KeyValue) Option {
 // By default if this Option is not provided, the LogSink will use the global
 // LoggerProvider.
 func WithLoggerProvider(provider log.LoggerProvider) Option {
-	return optFunc(func(c config) config {
-		c.provider = provider
-		return c
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithLevelSeverity returns an [Option] that configures the function used to
@@ -158,39 +122,15 @@ func WithLoggerProvider(provider log.LoggerProvider) Option {
 //   - logr.V(1) is transformed to [log.SeverityDebug].
 //   - logr.V(2) and higher are transformed to [log.SeverityTrace].
 func WithLevelSeverity(f func(int) log.Severity) Option {
-	return optFunc(func(c config) config {
-		c.levelSeverity = f
-		return c
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // NewLogSink returns a new [LogSink] to be used as a [logr.LogSink].
 //
 // If [WithLoggerProvider] is not provided, the returned [LogSink] will use the
 // global LoggerProvider.
-func NewLogSink(name string, options ...Option) *LogSink {
-	c := newConfig(options)
-
-	var opts []log.LoggerOption
-	if c.version != "" {
-		opts = append(opts, log.WithInstrumentationVersion(c.version))
-	}
-	if c.schemaURL != "" {
-		opts = append(opts, log.WithSchemaURL(c.schemaURL))
-	}
-	if c.attributes != nil {
-		opts = append(opts, log.WithInstrumentationAttributes(c.attributes...))
-	}
-
-	return &LogSink{
-		name:          name,
-		provider:      c.provider,
-		logger:        c.provider.Logger(name, opts...),
-		levelSeverity: c.levelSeverity,
-		opts:          opts,
-		ctx:           context.Background(),
-	}
-}
+func NewLogSink(name string, options ...Option) *LogSink { _ = "STUB: not implemented"; return nil }
 
 // LogSink is a [logr.LogSink] that sends all logging records it receives to
 // OpenTelemetry. See package documentation for how conversions are made.
@@ -213,96 +153,52 @@ var _ logr.LogSink = (*LogSink)(nil)
 // Enabled tests whether this LogSink is enabled at the specified V-level.
 // For example, commandline flags might be used to set the logging
 // verbosity and disable some info logs.
-func (l *LogSink) Enabled(level int) bool {
-	ctx := context.Background()
-	param := log.EnabledParameters{Severity: l.levelSeverity(level)}
-	return l.logger.Enabled(ctx, param)
-}
+func (l *LogSink) Enabled(level int) bool { _ = "STUB: not implemented"; return false }
 
 // Error logs an error, with the given message and key/value pairs.
 func (l *LogSink) Error(err error, msg string, keysAndValues ...any) {
-	var record log.Record
-	record.SetBody(log.StringValue(msg))
-	record.SetSeverity(log.SeverityError)
-	record.SetErr(err)
-
-	record.AddAttributes(l.attr...)
-
-	ctx, attr := convertKVs(l.ctx, keysAndValues...)
-	record.AddAttributes(attr...)
-
-	l.logger.Emit(ctx, record)
+	_ = "STUB: not implemented"
+	return
 }
 
 // Info logs a non-error message with the given key/value pairs.
 func (l *LogSink) Info(level int, msg string, keysAndValues ...any) {
-	var record log.Record
-	record.SetBody(log.StringValue(msg))
-	record.SetSeverity(l.levelSeverity(level))
-
-	record.AddAttributes(l.attr...)
-
-	ctx, attr := convertKVs(l.ctx, keysAndValues...)
-	record.AddAttributes(attr...)
-
-	l.logger.Emit(ctx, record)
+	_ = "STUB: not implemented"
+	return
 }
 
 // Init receives optional information about the logr library this
 // implementation does not use it.
 func (*LogSink) Init(logr.RuntimeInfo) {
+	_ = "STUB: not implemented"
 	// We don't need to do anything here.
 	// CallDepth is used to calculate the caller's PC.
 	// PC is dropped as part of the conversion to the OpenTelemetry log.Record.
+	return
 }
 
 // WithName returns a new LogSink with the specified name appended.
 func (l LogSink) WithName(name string) logr.LogSink {
-	l.name = l.name + "/" + name
-	l.logger = l.provider.Logger(l.name, l.opts...)
-	return &l
+	_ = "STUB: not implemented"
+	return *new(logr.LogSink)
 }
 
 // WithValues returns a new LogSink with additional key/value pairs.
 func (l LogSink) WithValues(keysAndValues ...any) logr.LogSink {
-	ctx, attr := convertKVs(l.ctx, keysAndValues...)
-	l.attr = append(l.attr, attr...)
-	l.ctx = ctx
-	return &l
+	_ = "STUB: not implemented"
+	return *new(logr.LogSink)
 }
 
 // convertKVs converts a list of key-value pairs to a list of [log.KeyValue].
 // The last [context.Context] value is returned as the context.
 // If no context is found, the original context is returned.
 func convertKVs(ctx context.Context, keysAndValues ...any) (context.Context, []log.KeyValue) {
-	if len(keysAndValues) == 0 {
-		return ctx, nil
-	}
-	if len(keysAndValues)%2 != 0 {
-		// Ensure an odd number of items here does not corrupt the list.
-		keysAndValues = append(keysAndValues, nil)
-	}
-
-	kvs := make([]log.KeyValue, 0, len(keysAndValues)/2)
-	for i := 0; i < len(keysAndValues); i += 2 {
-		k, ok := keysAndValues[i].(string)
-		if !ok {
-			// Ensure that the key is a string.
-			k = fmt.Sprintf("%v", keysAndValues[i])
-		}
-
-		v := keysAndValues[i+1]
-		if vCtx, ok := v.(context.Context); ok {
-			// Special case when a field is of context.Context type.
-			ctx = vCtx
-			continue
-		}
-
-		kvs = append(kvs, log.KeyValue{
-			Key:   k,
-			Value: convertValue(v),
-		})
-	}
-
-	return ctx, kvs
+	_ = "STUB: not implemented"
+	return *new(context.Context), nil
 }
+
+// Ensure an odd number of items here does not corrupt the list.
+
+// Ensure that the key is a string.
+
+// Special case when a field is of context.Context type.

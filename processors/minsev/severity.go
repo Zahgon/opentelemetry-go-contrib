@@ -6,10 +6,7 @@ package minsev // import "go.opentelemetry.io/contrib/processors/minsev"
 import (
 	"encoding"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"strconv"
-	"strings"
 	"sync/atomic"
 
 	"go.opentelemetry.io/otel/log"
@@ -87,22 +84,16 @@ const (
 //
 // It implements [Severitier].
 func (s Severity) Severity() log.Severity {
+	_ = "STUB: not implemented"
 	// Clamp to the defined range of log.Severity values. This provides a
 	// closer approximation for out-of-range values instead of returning
 	// log.SeverityUndefined.
-	switch {
-	case s < SeverityTrace1:
-		return log.SeverityTrace1
-	case s > SeverityFatal4:
-		return log.SeverityFatal4
-	}
-
-	// The relative ordering and contiguous definition of both sets of
-	// severities allows a constant offset translation instead of a lookup
-	// table. Keep this in sync if either definition changes.
-	const offset = int(log.SeverityTrace1) - int(SeverityTrace1)
-	return log.Severity(int(s) + offset)
+	return *new(log.Severity)
 }
+
+// The relative ordering and contiguous definition of both sets of
+// severities allows a constant offset translation instead of a lookup
+// table. Keep this in sync if either definition changes.
 
 // String returns a name for the severity level. If the severity level has a
 // name, then that name in uppercase is returned. If the severity level is
@@ -115,77 +106,44 @@ func (s Severity) Severity() log.Severity {
 //	(SeverityInfo1+2).String() => "INFO3"
 //	(SeverityFatal4+2).String() => "FATAL+6"
 //	(SeverityTrace1-3).String() => "TRACE-3"
-func (s Severity) String() string {
-	str := func(base string, val Severity) string {
-		switch val {
-		case 0:
-			return base
-		case 1, 2, 3:
-			// No sign for known fine-grained severity values.
-			return fmt.Sprintf("%s%d", base, val+1)
-		}
+func (s Severity) String() string { _ = "STUB: not implemented"; return "" }
 
-		if val > 0 {
-			// Exclude zero from positive scale count.
-			val++
-		}
-		return fmt.Sprintf("%s%+d", base, val)
-	}
+// No sign for known fine-grained severity values.
 
-	switch {
-	case s < SeverityDebug1:
-		return str("TRACE", s-SeverityTrace1)
-	case s < SeverityInfo1:
-		return str("DEBUG", s-SeverityDebug1)
-	case s < SeverityWarn1:
-		return str("INFO", s-SeverityInfo1)
-	case s < SeverityError1:
-		return str("WARN", s-SeverityWarn1)
-	case s < SeverityFatal1:
-		return str("ERROR", s-SeverityError1)
-	default:
-		return str("FATAL", s-SeverityFatal1)
-	}
-}
+// Exclude zero from positive scale count.
 
 // MarshalJSON implements [encoding/json.Marshaler] by quoting the output of
 // [Severity.String].
 func (s Severity) MarshalJSON() ([]byte, error) {
+	_ = "STUB: not implemented"
 	// AppendQuote is sufficient for JSON-encoding all Severity strings. They
 	// don't contain any runes that would produce invalid JSON when escaped.
-	return strconv.AppendQuote(nil, s.String()), nil
+	return nil, nil
 }
 
 // UnmarshalJSON implements [encoding/json.Unmarshaler] It accepts any string
 // produced by [Severity.MarshalJSON], ignoring case. It also accepts numeric
 // offsets that would result in a different string on output. For example,
 // "ERROR-8" will unmarshal as [SeverityInfo].
-func (s *Severity) UnmarshalJSON(data []byte) error {
-	str, err := strconv.Unquote(string(data))
-	if err != nil {
-		return err
-	}
-	return s.parse(str)
-}
+func (s *Severity) UnmarshalJSON(data []byte) error { _ = "STUB: not implemented"; return nil }
 
 // AppendText implements [encoding.TextAppender] by calling [Severity.String].
-func (s Severity) AppendText(b []byte) ([]byte, error) {
-	return append(b, s.String()...), nil
-}
+func (s Severity) AppendText(b []byte) ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // MarshalText implements [encoding.TextMarshaler] by calling
 // [Severity.AppendText].
 func (s Severity) MarshalText() ([]byte, error) {
-	return s.AppendText(nil)
+	_ = "STUB: not implemented"
+	return nil,
+
+		// UnmarshalText implements [encoding.TextUnmarshaler]. It accepts any string
+		// produced by [Severity.MarshalText], ignoring case. It also accepts numeric
+		// offsets that would result in a different string on output. For example,
+		// "ERROR-8" will marshal as [SeverityInfo].
+		nil
 }
 
-// UnmarshalText implements [encoding.TextUnmarshaler]. It accepts any string
-// produced by [Severity.MarshalText], ignoring case. It also accepts numeric
-// offsets that would result in a different string on output. For example,
-// "ERROR-8" will marshal as [SeverityInfo].
-func (s *Severity) UnmarshalText(data []byte) error {
-	return s.parse(string(data))
-}
+func (s *Severity) UnmarshalText(data []byte) error { _ = "STUB: not implemented"; return nil }
 
 // parse parses str into s.
 //
@@ -214,74 +172,29 @@ func (s *Severity) UnmarshalText(data []byte) error {
 // If a fine-grained level of 0 is provided it is treaded as equivalent to the
 // base severity level.  For example, "INFO0" is equivalent to [SeverityInfo1].
 func (s *Severity) parse(str string) (err error) {
-	if str == "" {
-		// Handle empty str as a special case and parse it as the default
-		// SeverityInfo1.
-		//
-		// Do not parse this below in the switch statement of the name. That
-		// will allow strings like "2", "-1", "2+1", "+3", etc. to be accepted
-		// and that adds ambiguity. For example, a user may expect that "2" is
-		// parsed as SeverityInfo2 based on an implied "SeverityInfo1" prefix,
-		// but they may also expect it be parsed as SeverityInfo3 which has a
-		// numeric value of 2. Avoid this ambiguity by treating those inputs
-		// as invalid, and only accept the empty string as a special case.
+	_ = "STUB: not implemented"
 
-		*s = SeverityInfo1 // Default severity.
-		return nil
-	}
-
-	defer func() {
-		if err != nil {
-			err = fmt.Errorf("minsev: severity string %q: %w", str, err)
-		}
-	}()
-
-	name := str
-	offset := 0
-
-	// Parse +/- offset suffix, if present.
-	if i := strings.IndexAny(str, "+-"); i >= 0 {
-		name = str[:i]
-		offset, err = strconv.Atoi(str[i:])
-		if err != nil {
-			return err
-		}
-	}
-
-	// Parse fine-grained severity level suffix, if present.
-	// This supports formats like "ERROR3", "FATAL4", etc.
-	i := len(name)
-	n, multi := 0, 1
-	for ; i > 0 && str[i-1] >= '0' && str[i-1] <= '9'; i-- {
-		n += int(str[i-1]-'0') * multi
-		multi *= 10
-	}
-	if i < len(name) {
-		name = name[:i]
-		if n != 0 {
-			offset += n - 1 // Convert 1-based to 0-based.
-		}
-	}
-
-	switch strings.ToUpper(name) {
-	case "TRACE":
-		*s = SeverityTrace1
-	case "DEBUG":
-		*s = SeverityDebug1
-	case "INFO":
-		*s = SeverityInfo1
-	case "WARN":
-		*s = SeverityWarn1
-	case "ERROR":
-		*s = SeverityError1
-	case "FATAL":
-		*s = SeverityFatal1
-	default:
-		return errors.New("unknown name")
-	}
-	*s += Severity(offset)
+	// Handle empty str as a special case and parse it as the default
+	// SeverityInfo1.
+	//
+	// Do not parse this below in the switch statement of the name. That
+	// will allow strings like "2", "-1", "2+1", "+3", etc. to be accepted
+	// and that adds ambiguity. For example, a user may expect that "2" is
+	// parsed as SeverityInfo2 based on an implied "SeverityInfo1" prefix,
+	// but they may also expect it be parsed as SeverityInfo3 which has a
+	// numeric value of 2. Avoid this ambiguity by treating those inputs
+	// as invalid, and only accept the empty string as a special case.
 	return nil
 }
+
+// Default severity.
+
+// Parse +/- offset suffix, if present.
+
+// Parse fine-grained severity level suffix, if present.
+// This supports formats like "ERROR3", "FATAL4", etc.
+
+// Convert 1-based to 0-based.
 
 // A SeverityVar is a [Severity] variable, to allow a [LogProcessor] severity
 // to change dynamically. It implements [Severitier] as well as a Set method,
@@ -302,42 +215,33 @@ var (
 )
 
 // Severity returns v's severity.
-func (v *SeverityVar) Severity() log.Severity {
-	return Severity(int(v.val.Load())).Severity()
-}
+func (v *SeverityVar) Severity() log.Severity { _ = "STUB: not implemented"; return *new(log.Severity) }
 
 // Set sets v's Severity to l.
-func (v *SeverityVar) Set(l Severity) {
-	v.val.Store(int64(l))
-}
+func (v *SeverityVar) Set(l Severity) { _ = "STUB: not implemented"; return }
 
 // String returns a string representation of the SeverityVar.
-func (v *SeverityVar) String() string {
-	return fmt.Sprintf("SeverityVar(%s)", Severity(int(v.val.Load())).String())
-}
+func (v *SeverityVar) String() string { _ = "STUB: not implemented"; return "" }
 
 // AppendText implements [encoding.TextAppender]
 // by calling [Severity.AppendText].
 func (v *SeverityVar) AppendText(b []byte) ([]byte, error) {
-	return Severity(int(v.val.Load())).AppendText(b)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // MarshalText implements [encoding.TextMarshaler]
 // by calling [SeverityVar.AppendText].
 func (v *SeverityVar) MarshalText() ([]byte, error) {
-	return v.AppendText(nil)
+	_ = "STUB: not implemented"
+	return nil,
+
+		// UnmarshalText implements [encoding.TextUnmarshaler]
+		// by calling [Severity.UnmarshalText].
+		nil
 }
 
-// UnmarshalText implements [encoding.TextUnmarshaler]
-// by calling [Severity.UnmarshalText].
-func (v *SeverityVar) UnmarshalText(data []byte) error {
-	var s Severity
-	if err := s.UnmarshalText(data); err != nil {
-		return err
-	}
-	v.Set(s)
-	return nil
-}
+func (v *SeverityVar) UnmarshalText(data []byte) error { _ = "STUB: not implemented"; return nil }
 
 // A Severitier provides a [log.Severity] value.
 type Severitier interface {

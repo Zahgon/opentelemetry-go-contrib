@@ -12,12 +12,6 @@ var devicesConnected = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 	Help: "Number of smart home devices currently connected",
 }, []string{"device_type"})
 
-func prometheusUpDownCounterUsage(reg *prometheus.Registry) {
-	reg.MustRegister(devicesConnected)
+func prometheusUpDownCounterUsage(reg *prometheus.Registry) { _ = "STUB: not implemented"; return }
 
-	// Increment when a device connects, decrement when it disconnects.
-	devicesConnected.WithLabelValues("thermostat").Inc()
-	devicesConnected.WithLabelValues("thermostat").Inc()
-	devicesConnected.WithLabelValues("lock").Inc()
-	devicesConnected.WithLabelValues("lock").Dec()
-}
+// Increment when a device connects, decrement when it disconnects.

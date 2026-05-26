@@ -6,7 +6,6 @@ package baggagecopy // import "go.opentelemetry.io/contrib/processors/baggagecop
 import (
 	"context"
 
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/baggage"
 	"go.opentelemetry.io/otel/sdk/trace"
 )
@@ -32,32 +31,28 @@ var _ trace.SpanProcessor = (*SpanProcessor)(nil)
 // The passed filter determines which baggage members are added to the span.
 //
 // If filter is nil, all baggage members will be added.
-func NewSpanProcessor(filter Filter) *SpanProcessor {
-	return &SpanProcessor{
-		filter: filter,
-	}
-}
+func NewSpanProcessor(filter Filter) *SpanProcessor { _ = "STUB: not implemented"; return nil }
 
 // OnStart is called when a span is started and adds span attributes for baggage contents.
 func (processor SpanProcessor) OnStart(ctx context.Context, span trace.ReadWriteSpan) {
-	filter := processor.filter
-	if filter == nil {
-		filter = AllowAllMembers
-	}
-
-	for _, member := range baggage.FromContext(ctx).Members() {
-		if filter(member) {
-			span.SetAttributes(attribute.String(member.Key(), member.Value()))
-		}
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // OnEnd is called when span is finished and is a no-op for this processor.
-func (SpanProcessor) OnEnd(trace.ReadOnlySpan) {}
+func (SpanProcessor) OnEnd(trace.ReadOnlySpan) {
+	_ = "STUB: not implemented"
 
-// Shutdown is called when the SDK shuts down and is a no-op for this processor.
-func (SpanProcessor) Shutdown(context.Context) error { return nil }
+	// Shutdown is called when the SDK shuts down and is a no-op for this processor.
+	return
+}
 
-// ForceFlush exports all ended spans to the configured Exporter that have not yet
-// been exported and is a no-op for this processor.
-func (SpanProcessor) ForceFlush(context.Context) error { return nil }
+func (SpanProcessor) Shutdown(context.Context) error {
+	_ = "STUB: not implemented"
+
+	// ForceFlush exports all ended spans to the configured Exporter that have not yet
+	// been exported and is a no-op for this processor.
+	return nil
+}
+
+func (SpanProcessor) ForceFlush(context.Context) error { _ = "STUB: not implemented"; return nil }

@@ -6,13 +6,8 @@
 package main
 
 import (
-	"context"
 	"log"
-	"net"
 	"net/http"
-	"os"
-	"os/signal"
-	"time"
 )
 
 func main() {
@@ -22,46 +17,26 @@ func main() {
 }
 
 func run() (err error) {
+	_ = "STUB: not implemented"
 	// Handle SIGINT (CTRL+C) gracefully.
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
-	defer stop()
-
-	// Start HTTP server.
-	srv := &http.Server{
-		Addr:         ":8080",
-		BaseContext:  func(net.Listener) context.Context { return ctx },
-		ReadTimeout:  time.Second,
-		WriteTimeout: 10 * time.Second,
-		Handler:      newHTTPHandler(),
-	}
-	srvErr := make(chan error, 1)
-	go func() {
-		log.Println("Running HTTP server...")
-		srvErr <- srv.ListenAndServe()
-	}()
-
-	// Wait for interruption.
-	select {
-	case err = <-srvErr:
-		// Error when starting HTTP server.
-		return err
-	case <-ctx.Done():
-		// Wait for first CTRL+C.
-		// Stop receiving signal notifications as soon as possible.
-		stop()
-	}
-
-	// When Shutdown is called, ListenAndServe immediately returns ErrServerClosed.
-	err = srv.Shutdown(context.Background())
-	return err
+	return nil
 }
 
+// Start HTTP server.
+
+// Wait for interruption.
+
+// Error when starting HTTP server.
+
+// Wait for first CTRL+C.
+// Stop receiving signal notifications as soon as possible.
+
+// When Shutdown is called, ListenAndServe immediately returns ErrServerClosed.
+
 func newHTTPHandler() http.Handler {
-	mux := http.NewServeMux()
+	_ = "STUB: not implemented"
+	return *
 
 	// Register handlers.
-	mux.HandleFunc("/rolldice/", rolldice)
-	mux.HandleFunc("/rolldice/{player}", rolldice)
-
-	return mux
+	new(http.Handler)
 }
